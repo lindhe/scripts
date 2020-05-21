@@ -149,6 +149,8 @@ def get_ip_from_record(
     print('\n')
     print('URL:\n' + full_url + '\n')
     print('Headers:\n' + json.dumps(headers, indent=4) + '\n')
+  # Setting ip to return something during dryrun
+  ip = '127.0.0.1'
   if not dryrun:
     if verbose:
       print("Getting record info...")
@@ -160,7 +162,8 @@ def get_ip_from_record(
     else:
       print('Repsonse:\n' + res.json(), file=sys.stderr)
       sys.exit(f"ERROR: could not get DNS record for {hostname}")
-    return res.json()['result']['content']
+    ip = res.json()['result']['content']
+  return ip
 
 # Get current public IP
 def current_public_ip() -> str:
