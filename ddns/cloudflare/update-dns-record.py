@@ -21,6 +21,8 @@ from typing import List
 import argparse
 import os
 import sys
+import requests
+import pathlib
 
 def main(content='',
     hostname='',
@@ -40,6 +42,33 @@ def assert_env_vars(envs: List):
   for e in envs:
     if not os.getenv(e):
       sys.exit(f'ERROR: Environment variable {e} is not defined.')
+
+def update_record(
+    content='',
+    dryrun=False,
+    hostname='',
+    record_type='A',
+    ttl=3600,
+    verbose=False,
+    ):
+  # API endpoint
+  api_endpoint = 'https://api.cloudflare.com/client/v4'
+  api_path = pathlib.PurePath(
+      'zones',
+      os.getenv('CF_DNS_ZONE_ID'),
+      'dns_records',
+      os.getenv('CF_DNS_RECORD_ID')
+      )
+  full_url = f"{api_endpoint}/{str(api_path)}"
+  # Headers
+  api_token = os.getenv('CF_DNS_API_TOKEN')
+  headers = {
+      "Authorization": f"Bearer {API_TOKEN}",
+      "Content-Type": "application/json"
+      }
+  if not dryrun:
+    pass
+
 
 if __name__ == '__main__':
   # Bootstrapping
