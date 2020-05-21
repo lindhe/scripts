@@ -77,17 +77,16 @@ def assert_env_vars(envs: List):
 def send_request(
     method: str,
     url: str,
-    headers={},
     data={},
     dryrun=False,
     verbose=False,
     ) -> requests.Response:
   assert method in ['get', 'put', 'post'], f"Incorrect method {method} for send_request()"
+  headers = make_headers()
   if verbose:
     print('\n')
     print('URL:\n' + url + '\n')
-    if headers:
-      print('Headers:\n' + json.dumps(headers, indent=4) + '\n')
+    print('Headers:\n' + json.dumps(headers, indent=4) + '\n')
     if data:
       print('Data:\n' + json.dumps(data, indent=4) + '\n')
   if not dryrun:
@@ -131,11 +130,6 @@ def update_record(
       os.getenv('CF_DNS_RECORD_ID')
       )
   full_url = f"{api_endpoint}/{str(api_path)}"
-  # Headers
-  headers = {
-      "Authorization": f"Bearer {os.getenv('CF_DNS_API_TOKEN')}",
-      "Content-Type": "application/json"
-      }
   # Data
   data = {
       'type': record_type,
@@ -146,14 +140,12 @@ def update_record(
   print("Sending request to update record...")
   send_request(
       'put',
-      headers = headers,
       url = full_url,
       data = data,
       dryrun = dryrun,
       verbose = verbose
       )
 
-# TODO: Deduplicate this code later
 def get_ip_from_record(
     content='',
     dryrun=False,
@@ -171,19 +163,12 @@ def get_ip_from_record(
       str(os.getenv('CF_DNS_RECORD_ID'))
       )
   full_url = f"{api_endpoint}/{str(api_path)}"
-  # Headers
-  headers = {
-      "Authorization": f"Bearer {os.getenv('CF_DNS_API_TOKEN')}",
-      "Content-Type": "application/json"
-      }
   # Print
   if verbose:
     print('\n')
     print('URL:\n' + full_url + '\n')
-    print('Headers:\n' + json.dumps(headers, indent=4) + '\n')
   res = send_request(
       'get',
-      headers = headers,
       url = full_url,
       dryrun = dryrun,
       verbose = verbose
@@ -194,6 +179,11 @@ def get_ip_from_record(
     ip = res.json()['result']['content']
   return ip
 
+def make_headers() -> dict:
+  return {
+      "Authorization": f"Bearer {os.getenv('CF_DNS_API_TOKEN')}",
+      "Content-Type": "application/json"
+      }
 
 # Get current public IP
 def current_public_ip() -> str:
