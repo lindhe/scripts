@@ -91,7 +91,6 @@ if __name__ == '__main__':
         record_type=args.ttl,
         verbose=args.verbose
         )
-    main(hostname=args.hostname)
   except KeyboardInterrupt:
     sys.exit("\nInterrupted by ^C\n")
 
