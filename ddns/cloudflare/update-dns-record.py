@@ -32,6 +32,8 @@ def main(content='',
     dryrun=False,
     verbose=False
     ):
+  if verbose:
+    print(f"dryrun = {dryrun}")
   required_environment_variables = [
       'CF_DNS_API_TOKEN',
       'CF_DNS_ZONE_ID',
