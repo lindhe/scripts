@@ -22,7 +22,13 @@ import argparse
 import os
 import sys
 
-def main(content='', hostname='', ttl=3600, record_type='A', dryrun=False, verbose=False):
+def main(content='',
+    hostname='',
+    ttl=3600,
+    record_type='A',
+    dryrun=False,
+    verbose=False
+    ):
   required_environment_variables = [
       'CF_DNS_API_TOKEN',
       'CF_DNS_ZONE_ID',
