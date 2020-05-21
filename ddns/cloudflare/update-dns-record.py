@@ -22,7 +22,7 @@ import argparse
 import os
 import sys
 
-def main(content='', hostname='', ttl=3600, record_type='A', dryrun=False):
+def main(content='', hostname='', ttl=3600, record_type='A', dryrun=False, verbose=False):
   required_environment_variables = [
       'CF_DNS_API_TOKEN',
       'CF_DNS_ZONE_ID',
@@ -44,6 +44,7 @@ if __name__ == '__main__':
   p.add_argument('--hostname', help="hostname to update", required=True)
   p.add_argument('--ttl', help="ttl in seconds for the DNS record (default: 3600)", default=3600)
   p.add_argument('--type', help="record type (default: A)", choices=['A', 'AAAA', 'CNAME'], default='A')
+  p.add_argument('--verbose', help="print more", action="store_true")
   # Run:
   args = p.parse_args()
   try:
@@ -52,7 +53,8 @@ if __name__ == '__main__':
         dryrun=args.dryrun,
         hostname=args.hostname,
         ttl=args.ttl,
-        record_type=args.ttl
+        record_type=args.ttl,
+        verbose=args.verbose
         )
     main(hostname=args.hostname)
   except KeyboardInterrupt:
