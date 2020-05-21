@@ -110,6 +110,9 @@ def update_record(
           file=sys.stdout)
       res.json()
 
+# Get current public IP
+def current_public_ip() -> str:
+  return requests.get('https://ipv4.icanhazip.com').text.strip()
 
 if __name__ == '__main__':
   # Bootstrapping
