@@ -99,16 +99,13 @@ def update_record(
     if verbose:
       print("Sending request to update record...")
     res = requests.put(full_url, headers=headers, data=data)
-    if verbose:
-      print('\n')
-      print('Repsonse:\n' + res.json())
     if res.ok:
       if verbose:
         print(f"Successfully updated record for {hostname}")
+        print('Repsonse:\n' + res.json())
     else:
-      print(f"ERROR: could not update DNS record for {hostname}",
-          file=sys.stdout)
-      res.json()
+      print('Repsonse:\n' + res.json(), file=sys.stderr)
+      sys.exit(f"ERROR: could not update DNS record for {hostname}")
 
 # Get current public IP
 def current_public_ip() -> str:
