@@ -39,9 +39,14 @@ def main(content='',
   assert_env_vars(required_environment_variables)
 
 def assert_env_vars(envs: List):
+  unset_variables = []
   for e in envs:
     if not os.getenv(e):
-      sys.exit(f'ERROR: Environment variable {e} is not defined.')
+      unset_variables.append(e)
+  if unset_variables:
+    print('ERROR: The following environment variables were not set:\n',
+        unset_variables, file=sys.stderr)
+    sys.exit(1)
 
 def update_record(
     content='',
