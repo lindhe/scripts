@@ -74,6 +74,46 @@ def assert_env_vars(envs: List):
         unset_variables, file=sys.stderr)
     sys.exit(1)
 
+def send_request(
+    method: str,
+    url: str,
+    headers={},
+    data={},
+    dryrun=False,
+    verbose=False,
+    ) -> requests.Response:
+  assert method in ['get', 'put', 'post'], f"Incorrect method {method} for send_request()"
+  if verbose:
+    print('\n')
+    print('URL:\n' + url + '\n')
+    if headers:
+      print('Headers:\n' + json.dumps(headers, indent=4) + '\n')
+    if data:
+      print('Data:\n' + json.dumps(data, indent=4) + '\n')
+  if not dryrun:
+    if verbose:
+      print("Sending request...")
+    if method == 'get':
+      res = requests.get(url, headers=headers)
+    if method == 'put':
+      res = requests.put(url, headers=headers, data=data)
+    if res.ok:
+      if verbose:
+        print('Success!')
+        print('# Repsonse:\n' + res.json())
+    else:
+      rq = res.request
+      print('\n')
+      print('# Request:\n'
+          + 'Method: ' + str(rq.method) + '\n'
+          + 'URL: ' + str(rq.url) + '\n'
+          + 'Headers:\n' + str(rq.headers) + '\n'
+          , file=sys.stderr)
+      print('\n')
+      print('Repsonse:\n' + res.json(), file=sys.stderr)
+      sys.exit(f"ERROR: got an error when sending request.")
+  return res
+
 def update_record(
     content='',
     dryrun=False,
@@ -103,23 +143,15 @@ def update_record(
       'content': content,
       'ttl': ttl,
       }
-  # Print
-  if verbose:
-    print('\n')
-    print('URL:\n' + full_url + '\n')
-    print('Headers:\n' + json.dumps(headers, indent=4) + '\n')
-    print('Data:\n' + json.dumps(data, indent=4) + '\n')
-  if not dryrun:
-    if verbose:
-      print("Sending request to update record...")
-    res = requests.put(full_url, headers=headers, data=data)
-    if res.ok:
-      if verbose:
-        print(f"Successfully updated record for {hostname}")
-        print('Repsonse:\n' + res.json())
-    else:
-      print('Repsonse:\n' + res.json(), file=sys.stderr)
-      sys.exit(f"ERROR: could not update DNS record for {hostname}")
+  print("Sending request to update record...")
+  send_request(
+      'put',
+      headers = headers,
+      url = full_url,
+      data = data,
+      dryrun = dryrun,
+      verbose = verbose
+      )
 
 # TODO: Deduplicate this code later
 def get_ip_from_record(
@@ -149,21 +181,19 @@ def get_ip_from_record(
     print('\n')
     print('URL:\n' + full_url + '\n')
     print('Headers:\n' + json.dumps(headers, indent=4) + '\n')
+  res = send_request(
+      'get',
+      headers = headers,
+      url = full_url,
+      dryrun = dryrun,
+      verbose = verbose
+      )
   # Setting ip to return something during dryrun
   ip = '127.0.0.1'
   if not dryrun:
-    if verbose:
-      print("Getting record info...")
-    res = requests.get(full_url, headers=headers)
-    if res.ok:
-      if verbose:
-        print(f"Successfully received record for {hostname}")
-        print('Repsonse:\n' + res.json())
-    else:
-      print('Repsonse:\n' + res.json(), file=sys.stderr)
-      sys.exit(f"ERROR: could not get DNS record for {hostname}")
     ip = res.json()['result']['content']
   return ip
+
 
 # Get current public IP
 def current_public_ip() -> str:
