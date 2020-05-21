@@ -88,7 +88,6 @@ def update_record(
       'name': hostname,
       'content': content,
       'ttl': ttl,
-      'proxied': 'false'
       }
   # Print
   if verbose:
