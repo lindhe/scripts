@@ -19,6 +19,7 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 
 from typing import List
 import argparse
+import json
 import os
 import pathlib
 import requests
@@ -40,6 +41,14 @@ def main(content='',
       'CF_DNS_RECORD_ID'
       ]
   assert_env_vars(required_environment_variables)
+  update_record(
+      content=content,
+      dryrun=dryrun,
+      hostname=hostname,
+      record_type=record_type,
+      ttl=ttl,
+      verbose=verbose
+      )
 
 def assert_env_vars(envs: List):
   unset_variables = []
@@ -69,13 +78,28 @@ def update_record(
       )
   full_url = f"{api_endpoint}/{str(api_path)}"
   # Headers
-  api_token = os.getenv('CF_DNS_API_TOKEN')
   headers = {
-      "Authorization": f"Bearer {API_TOKEN}",
+      "Authorization": f"Bearer {os.getenv('CF_DNS_API_TOKEN')}",
       "Content-Type": "application/json"
       }
+  # Data
+  data = {
+      'type': record_type,
+      'name': hostname,
+      'content': content,
+      'ttl': ttl,
+      'proxied': 'false'
+      }
+  # Print
+  if verbose:
+    print('\n')
+    print('URL:\n' + full_url + '\n')
+    print('Headers:\n' + json.dumps(headers, indent=4) + '\n')
+    print('Data:\n' + json.dumps(data, indent=4) + '\n')
   if not dryrun:
-    pass
+    if verbose:
+      print("Sending request...")
+    res = requests.put(full_url, headers=headers, data=data)
 
 
 if __name__ == '__main__':
