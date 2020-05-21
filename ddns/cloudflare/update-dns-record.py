@@ -43,14 +43,7 @@ def main(content='',
   assert_env_vars(required_environment_variables)
   # Compare IP to avoid updating unnecessarily
   my_ip = current_public_ip()
-  record_ip = get_ip_from_record(
-      content=content,
-      dryrun=dryrun,
-      hostname=hostname,
-      record_type=record_type,
-      ttl=ttl,
-      verbose=verbose
-      )
+  record_ip = get_ip_from_record(dryrun=dryrun, verbose=verbose)
   # Only update record if the IPxs differ
   if my_ip != record_ip:
     if verbose:
@@ -146,14 +139,7 @@ def update_record(
       verbose = verbose
       )
 
-def get_ip_from_record(
-    content='',
-    dryrun=False,
-    hostname='',
-    record_type='A',
-    ttl=3600,
-    verbose=False,
-    ) -> str:
+def get_ip_from_record(dryrun=False, verbose=False) -> str:
   # API endpoint
   api_endpoint = 'https://api.cloudflare.com/client/v4'
   api_path = pathlib.PurePath(
