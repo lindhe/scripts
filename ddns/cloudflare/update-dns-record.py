@@ -20,9 +20,10 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 from typing import List
 import argparse
 import os
-import sys
-import requests
 import pathlib
+import requests
+import sys
+
 
 def main(content='',
     hostname='',
