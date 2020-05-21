@@ -11,6 +11,10 @@ Before running, make sure you have set the following environment variables:
 CF_DNS_API_TOKEN
 CF_DNS_ZONE_ID
 CF_DNS_RECORD_ID
+
+Documentation about the API can be found here:
+https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
+
 """
 
 from typing import List
