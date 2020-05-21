@@ -69,12 +69,12 @@ def assert_env_vars(envs: List):
 
 def send_request(
     method: str,
-    url: str,
     data={},
     dryrun=False,
     verbose=False,
     ) -> requests.Response:
   assert method in ['get', 'put', 'post'], f"Incorrect method {method} for send_request()"
+  url = make_api_url()
   headers = make_headers()
   if verbose:
     print('\n')
@@ -114,15 +114,6 @@ def update_record(
     ttl=3600,
     verbose=False,
     ):
-  # API endpoint
-  api_endpoint = 'https://api.cloudflare.com/client/v4'
-  api_path = pathlib.PurePath(
-      'zones',
-      os.getenv('CF_DNS_ZONE_ID'),
-      'dns_records',
-      os.getenv('CF_DNS_RECORD_ID')
-      )
-  full_url = f"{api_endpoint}/{str(api_path)}"
   # Data
   data = {
       'type': record_type,
@@ -133,29 +124,14 @@ def update_record(
   print("Sending request to update record...")
   send_request(
       'put',
-      url = full_url,
       data = data,
       dryrun = dryrun,
       verbose = verbose
       )
 
 def get_ip_from_record(dryrun=False, verbose=False) -> str:
-  # API endpoint
-  api_endpoint = 'https://api.cloudflare.com/client/v4'
-  api_path = pathlib.PurePath(
-      'zones',
-      str(os.getenv('CF_DNS_ZONE_ID')),
-      'dns_records',
-      str(os.getenv('CF_DNS_RECORD_ID'))
-      )
-  full_url = f"{api_endpoint}/{str(api_path)}"
-  # Print
-  if verbose:
-    print('\n')
-    print('URL:\n' + full_url + '\n')
   res = send_request(
       'get',
-      url = full_url,
       dryrun = dryrun,
       verbose = verbose
       )
@@ -170,6 +146,20 @@ def make_headers() -> dict:
       "Authorization": f"Bearer {os.getenv('CF_DNS_API_TOKEN')}",
       "Content-Type": "application/json"
       }
+
+def make_api_url(verbose=False) -> str:
+  # API endpoint
+  api_endpoint = 'https://api.cloudflare.com/client/v4'
+  api_path = pathlib.PurePath(
+      'zones',
+      str(os.getenv('CF_DNS_ZONE_ID')),
+      'dns_records',
+      str(os.getenv('CF_DNS_RECORD_ID'))
+      )
+  url = f"{api_endpoint}/{str(api_path)}"
+  if verbose:
+    pass
+  return url
 
 # Get current public IP
 def current_public_ip() -> str:
