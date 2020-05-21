@@ -99,6 +99,16 @@ def update_record(
     if verbose:
       print("Sending request...")
     res = requests.put(full_url, headers=headers, data=data)
+    if verbose:
+      print('\n')
+      print('Repsonse:\n' + res.json())
+    if res.ok:
+      if verbose:
+        print(f"Successfully updated record for {hostname}")
+    else:
+      print(f"ERROR: could not update DNS record for {hostname}",
+          file=sys.stdout)
+      res.json()
 
 
 if __name__ == '__main__':
