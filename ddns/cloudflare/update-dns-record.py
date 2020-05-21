@@ -134,9 +134,9 @@ def get_ip_from_record(
   api_endpoint = 'https://api.cloudflare.com/client/v4'
   api_path = pathlib.PurePath(
       'zones',
-      os.getenv('CF_DNS_ZONE_ID'),
+      str(os.getenv('CF_DNS_ZONE_ID')),
       'dns_records',
-      os.getenv('CF_DNS_RECORD_ID')
+      str(os.getenv('CF_DNS_RECORD_ID'))
       )
   full_url = f"{api_endpoint}/{str(api_path)}"
   # Headers
