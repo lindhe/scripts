@@ -22,7 +22,7 @@ import os
 import sys
 import argparse
 
-def main(hostname: str):
+def main(content='', hostname='', ttl=3600, record_type='A'):
   required_environment_variables = [
       'CF_DNS_API_TOKEN',
       'CF_DNS_ZONE_ID',
@@ -46,6 +46,12 @@ if __name__ == '__main__':
   # Run:
   args = p.parse_args()
   try:
+    main(
+        content=args.content,
+        hostname=args.hostname,
+        ttl=args.ttl,
+        record_type=args.ttl
+        )
     main(hostname=args.hostname)
   except KeyboardInterrupt:
     sys.exit("\nInterrupted by ^C\n")
