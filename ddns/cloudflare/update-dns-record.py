@@ -74,12 +74,9 @@ def send_request(
     verbose=False,
     ) -> requests.Response:
   assert method in ['get', 'put', 'post'], f"Incorrect method {method} for send_request()"
-  url = make_api_url()
-  headers = make_headers()
+  url = make_api_url(verbose=verbose)
+  headers = make_headers(verbose=verbose)
   if verbose:
-    print('\n')
-    print('URL:\n' + url + '\n')
-    print('Headers:\n' + json.dumps(headers, indent=4) + '\n')
     if data:
       print('Data:\n' + json.dumps(data, indent=4) + '\n')
   if not dryrun:
@@ -141,11 +138,15 @@ def get_ip_from_record(dryrun=False, verbose=False) -> str:
     ip = res.json()['result']['content']
   return ip
 
-def make_headers() -> dict:
-  return {
+def make_headers(verbose=False) -> dict:
+  headers = {
       "Authorization": f"Bearer {os.getenv('CF_DNS_API_TOKEN')}",
       "Content-Type": "application/json"
       }
+  if verbose:
+    print('\n')
+    print('Headers:\n' + json.dumps(headers, indent=4) + '\n')
+  return headers
 
 def make_api_url(verbose=False) -> str:
   # API endpoint
@@ -158,7 +159,8 @@ def make_api_url(verbose=False) -> str:
       )
   url = f"{api_endpoint}/{str(api_path)}"
   if verbose:
-    pass
+    print('\n')
+    print('URL:\n' + url + '\n')
   return url
 
 # Get current public IP
