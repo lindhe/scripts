@@ -18,9 +18,9 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 """
 
 from typing import List
+import argparse
 import os
 import sys
-import argparse
 
 def main(content='', hostname='', ttl=3600, record_type='A'):
   required_environment_variables = [
