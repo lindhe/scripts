@@ -76,9 +76,8 @@ def send_request(
   assert method in ['get', 'put', 'post'], f"Incorrect method {method} for send_request()"
   url = make_api_url(verbose=verbose)
   headers = make_headers(verbose=verbose)
-  if verbose:
-    if data:
-      print('Data:\n' + json.dumps(data, indent=4) + '\n')
+  if verbose and data:
+    print('Data:\n' + json.dumps(data, indent=4) + '\n')
   if not dryrun:
     if verbose:
       print("Sending request...")
