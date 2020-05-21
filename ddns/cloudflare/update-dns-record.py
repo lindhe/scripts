@@ -97,7 +97,7 @@ def update_record(
     print('Data:\n' + json.dumps(data, indent=4) + '\n')
   if not dryrun:
     if verbose:
-      print("Sending request...")
+      print("Sending request to update record...")
     res = requests.put(full_url, headers=headers, data=data)
     if verbose:
       print('\n')
