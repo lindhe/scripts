@@ -41,7 +41,9 @@ def main(content='',
       'CF_DNS_RECORD_ID'
       ]
   assert_env_vars(required_environment_variables)
-  update_record(
+  # Compare IP to avoid updating unnecessarily
+  my_ip = current_public_ip()
+  record_ip = get_ip_from_record(
       content=content,
       dryrun=dryrun,
       hostname=hostname,
@@ -49,6 +51,18 @@ def main(content='',
       ttl=ttl,
       verbose=verbose
       )
+  # Only update record if the IPxs differ
+  if my_ip != record_ip:
+    if verbose:
+      print('Current IP differs from DNS record.')
+    update_record(
+        content=content,
+        dryrun=dryrun,
+        hostname=hostname,
+        record_type=record_type,
+        ttl=ttl,
+        verbose=verbose
+        )
 
 def assert_env_vars(envs: List):
   unset_variables = []
@@ -107,9 +121,51 @@ def update_record(
       print('Repsonse:\n' + res.json(), file=sys.stderr)
       sys.exit(f"ERROR: could not update DNS record for {hostname}")
 
+# TODO: Deduplicate this code later
+def get_ip_from_record(
+    content='',
+    dryrun=False,
+    hostname='',
+    record_type='A',
+    ttl=3600,
+    verbose=False,
+    ) -> str:
+  # API endpoint
+  api_endpoint = 'https://api.cloudflare.com/client/v4'
+  api_path = pathlib.PurePath(
+      'zones',
+      os.getenv('CF_DNS_ZONE_ID'),
+      'dns_records',
+      os.getenv('CF_DNS_RECORD_ID')
+      )
+  full_url = f"{api_endpoint}/{str(api_path)}"
+  # Headers
+  headers = {
+      "Authorization": f"Bearer {os.getenv('CF_DNS_API_TOKEN')}",
+      "Content-Type": "application/json"
+      }
+  # Print
+  if verbose:
+    print('\n')
+    print('URL:\n' + full_url + '\n')
+    print('Headers:\n' + json.dumps(headers, indent=4) + '\n')
+  if not dryrun:
+    if verbose:
+      print("Getting record info...")
+    res = requests.get(full_url, headers=headers)
+    if res.ok:
+      if verbose:
+        print(f"Successfully received record for {hostname}")
+        print('Repsonse:\n' + res.json())
+    else:
+      print('Repsonse:\n' + res.json(), file=sys.stderr)
+      sys.exit(f"ERROR: could not get DNS record for {hostname}")
+    return res.json()['result']['content']
+
 # Get current public IP
 def current_public_ip() -> str:
   return requests.get('https://ipv4.icanhazip.com').text.strip()
+
 
 if __name__ == '__main__':
   # Bootstrapping
