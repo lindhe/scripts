@@ -1,0 +1,21 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@0.2.1
+
+jobs:
+  lint:
+    working_directory: ~/ddns/cloudflare/
+      steps:
+        - checkout  # checkout source code to working directory
+        - run:
+            name: Install and lint
+            command: |  # use pipenv to install dependencies
+              sudo pip install pipenv
+              pipenv install --dev
+              pipenv run pylint ./update_dns_record.py
+
+workflows:
+  main:
+    jobs:
+      - lint
