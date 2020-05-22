@@ -140,14 +140,15 @@ def get_ip_from_record(dryrun=False, verbose=False) -> str:
 
 
 def make_headers(verbose=False) -> dict:
-  headers = {
-      "Authorization": f"Bearer {os.getenv('CF_DNS_API_TOKEN')}",
-      "Content-Type": "application/json"
-      }
-  if verbose:
-    print('\n')
-    print('Headers:\n' + json.dumps(headers, indent=4) + '\n')
-  return headers
+    headers = {
+        "Authorization": f"Bearer {os.getenv('CF_DNS_API_TOKEN')}",
+        "Content-Type": "application/json"
+        }
+    if verbose:
+        print('\n')
+        print('Headers:\n' + json.dumps(headers, indent=4) + '\n')
+    return headers
+
 
 def make_api_url(verbose=False) -> str:
   # API endpoint
