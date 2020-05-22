@@ -58,14 +58,15 @@ def main(content='',
         )
 
 def assert_env_vars(envs: List):
-  unset_variables = []
-  for e in envs:
-    if not os.getenv(e):
-      unset_variables.append(e)
-  if unset_variables:
-    print('ERROR: The following environment variables were not set:\n',
-        unset_variables, file=sys.stderr)
-    sys.exit(1)
+    unset_variables = []
+    for e in envs:
+        if not os.getenv(e):
+            unset_variables.append(e)
+    if unset_variables:
+        print('ERROR: The following environment variables were not set:\n',
+              unset_variables, file=sys.stderr)
+        sys.exit(1)
+
 
 def send_request(
     method: str,
