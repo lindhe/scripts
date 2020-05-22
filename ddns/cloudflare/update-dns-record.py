@@ -151,19 +151,19 @@ def make_headers(verbose=False) -> dict:
 
 
 def make_api_url(verbose=False) -> str:
-  # API endpoint
-  api_endpoint = 'https://api.cloudflare.com/client/v4'
-  api_path = pathlib.PurePath(
-      'zones',
-      str(os.getenv('CF_DNS_ZONE_ID')),
-      'dns_records',
-      str(os.getenv('CF_DNS_RECORD_ID'))
-      )
-  url = f"{api_endpoint}/{str(api_path)}"
-  if verbose:
-    print('\n')
-    print('URL:\n' + url + '\n')
-  return url
+    # API endpoint
+    api_endpoint = 'https://api.cloudflare.com/client/v4'
+    api_path = pathlib.PurePath(
+        'zones',
+        str(os.getenv('CF_DNS_ZONE_ID')),
+        'dns_records',
+        str(os.getenv('CF_DNS_RECORD_ID'))
+        )
+    url = f"{api_endpoint}/{str(api_path)}"
+    if verbose:
+        print('\n')
+        print('URL:\n' + url + '\n')
+    return url
 
 # Get current public IP
 def current_public_ip() -> str:
