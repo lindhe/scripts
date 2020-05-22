@@ -224,7 +224,7 @@ if __name__ == '__main__':
             hostname=args.hostname,
             ip_address=args.ip_address,
             ttl=args.ttl,
-            record_type=args.ttl,
+            record_type=args.type,
             verbose=args.verbose
             )
     except KeyboardInterrupt:
