@@ -125,17 +125,17 @@ def update_record(
     print("Sending request to update record...")
     send_request(
         'put',
-        data = data,
-        dryrun = dryrun,
-        verbose = verbose
+        data=data,
+        dryrun=dryrun,
+        verbose=verbose
         )
 
 
 def get_ip_from_record(dryrun=False, verbose=False) -> str:
     res = send_request(
         'get',
-        dryrun = dryrun,
-        verbose = verbose
+        dryrun=dryrun,
+        verbose=verbose
         )
     # Setting ip to return something during dryrun
     ip = '127.0.0.1'
