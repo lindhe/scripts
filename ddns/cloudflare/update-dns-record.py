@@ -99,8 +99,7 @@ def send_request(
             print('# Request:\n'
                   + 'Method: ' + str(rq.method) + '\n'
                   + 'URL: ' + str(rq.url) + '\n'
-                  + 'Headers:\n' + str(rq.headers) + '\n'
-                , file=sys.stderr)
+                  + 'Headers:\n' + str(rq.headers) + '\n', file=sys.stderr)
             print('\n')
             print('Repsonse:\n' + res.json(), file=sys.stderr)
             sys.exit(f"ERROR: got an error when sending request.")
