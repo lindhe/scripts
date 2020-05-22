@@ -34,29 +34,30 @@ def main(
         dryrun=False,
         verbose=False
         ):
-  if verbose:
-    print(f"dryrun = {dryrun}")
-  required_environment_variables = [
-      'CF_DNS_API_TOKEN',
-      'CF_DNS_ZONE_ID',
-      'CF_DNS_RECORD_ID'
-      ]
-  assert_env_vars(required_environment_variables)
-  # Compare IP to avoid updating unnecessarily
-  my_ip = current_public_ip()
-  record_ip = get_ip_from_record(dryrun=dryrun, verbose=verbose)
-  # Only update record if the IPxs differ
-  if my_ip != record_ip:
     if verbose:
-      print('Current IP differs from DNS record.')
-    update_record(
-        content=content,
-        dryrun=dryrun,
-        hostname=hostname,
-        record_type=record_type,
-        ttl=ttl,
-        verbose=verbose
-        )
+        print(f"dryrun = {dryrun}")
+    required_environment_variables = [
+        'CF_DNS_API_TOKEN',
+        'CF_DNS_ZONE_ID',
+        'CF_DNS_RECORD_ID'
+        ]
+    assert_env_vars(required_environment_variables)
+    # Compare IP to avoid updating unnecessarily
+    my_ip = current_public_ip()
+    record_ip = get_ip_from_record(dryrun=dryrun, verbose=verbose)
+    # Only update record if the IPxs differ
+    if my_ip != record_ip:
+        if verbose:
+            print('Current IP differs from DNS record.')
+        update_record(
+            content=content,
+            dryrun=dryrun,
+            hostname=hostname,
+            record_type=record_type,
+            ttl=ttl,
+            verbose=verbose
+            )
+
 
 def assert_env_vars(envs: List):
     unset_variables = []
