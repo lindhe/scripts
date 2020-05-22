@@ -32,6 +32,7 @@ import requests
 def main(
         content='',
         hostname='',
+        ip_address='',
         ttl=3600,
         record_type='A',
         dryrun=False,
@@ -48,7 +49,10 @@ def main(
     assert_env_vars(required_environment_variables)
     # Compare IP to avoid updating unnecessarily
     my_ip = current_public_ip()
-    record_ip = get_record_content(dryrun=dryrun, verbose=verbose)
+    if ip_address:
+        record_ip = ip_address
+    else:
+        record_ip = get_record_content(dryrun=dryrun, verbose=verbose)
     # Only update record if the IPxs differ
     if my_ip != record_ip:
         if verbose:
@@ -199,6 +203,9 @@ if __name__ == '__main__':
         action="store_true")
     p.add_argument('--hostname', help="hostname to update", required=True)
     p.add_argument(
+        '--ip-address',
+        help="instead of looking up this host's IP, use this one")
+    p.add_argument(
         '--ttl',
         help="ttl in seconds for the DNS record (default: 3600)",
         default=3600)
@@ -218,6 +225,7 @@ if __name__ == '__main__':
             content=args.content,
             dryrun=args.dryrun,
             hostname=args.hostname,
+            ip_address=args.ip_address,
             ttl=args.ttl,
             record_type=args.ttl,
             verbose=args.verbose
