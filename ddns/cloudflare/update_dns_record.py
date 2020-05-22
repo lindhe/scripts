@@ -66,9 +66,9 @@ def main(
 def assert_env_vars(envs: List):
     """ Checks a list of environment variables to make sure they are set. """
     unset_variables = []
-    for e in envs:
-        if not os.getenv(e):
-            unset_variables.append(e)
+    for variable in envs:
+        if not os.getenv(variable):
+            unset_variables.append(variable)
     if unset_variables:
         print('ERROR: The following environment variables were not set:\n',
               unset_variables, file=sys.stderr)
@@ -100,12 +100,12 @@ def send_request(
                 print('Success!')
                 print('# Repsonse:\n' + res.json())
         else:
-            rq = res.request
+            request = res.request
             print('\n')
             print('# Request:\n'
-                  + 'Method: ' + str(rq.method) + '\n'
-                  + 'URL: ' + str(rq.url) + '\n'
-                  + 'Headers:\n' + str(rq.headers) + '\n', file=sys.stderr)
+                  + 'Method: ' + str(request.method) + '\n'
+                  + 'URL: ' + str(request.url) + '\n'
+                  + 'Headers:\n' + str(request.headers) + '\n', file=sys.stderr)
             print('\n')
             print('Repsonse:\n' + res.json(), file=sys.stderr)
             sys.exit("ERROR: got an error when sending request.")
@@ -146,10 +146,10 @@ def get_ip_from_record(dryrun=False, verbose=False) -> str:
         verbose=verbose
         )
     # Setting ip to return something during dryrun
-    ip = '127.0.0.1'
+    ip_address = '127.0.0.1'
     if not dryrun:
-        ip = res.json()['result']['content']
-    return ip
+        ip_address = res.json()['result']['content']
+    return ip_address
 
 
 def make_headers(verbose=False) -> dict:
