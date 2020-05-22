@@ -30,7 +30,6 @@ import requests
 
 
 def main(
-        content='',
         hostname='',
         ip_address='',
         ttl=3600,
@@ -48,17 +47,14 @@ def main(
         ]
     assert_env_vars(required_environment_variables)
     # Compare IP to avoid updating unnecessarily
-    my_ip = current_public_ip()
-    if ip_address:
-        record_ip = ip_address
-    else:
-        record_ip = get_record_content(dryrun=dryrun, verbose=verbose)
+    my_ip = ip_address or current_public_ip()
+    record_ip = get_record_content(dryrun=dryrun, verbose=verbose)
     # Only update record if the IPxs differ
     if my_ip != record_ip:
         if verbose:
             print('Current IP differs from DNS record.')
         update_record(
-            content=content,
+            content=my_ip,
             dryrun=dryrun,
             hostname=hostname,
             record_type=record_type,
@@ -199,7 +195,6 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser(
         description="Updates a DNS record on Cloudflare")
     # Add cli arguments
-    p.add_argument('--content', help="content of the hostname", required=True)
     p.add_argument(
         '--dryrun',
         help="run without sending any requests",
@@ -225,7 +220,6 @@ if __name__ == '__main__':
     args = p.parse_args()
     try:
         main(
-            content=args.content,
             dryrun=args.dryrun,
             hostname=args.hostname,
             ip_address=args.ip_address,
