@@ -77,7 +77,7 @@ def assert_env_vars(envs: List):
 
 def send_request(
         method: str,
-        data=None,
+        json_data=None,
         dryrun=False,
         verbose=False,
         ) -> requests.Response:
@@ -86,8 +86,8 @@ def send_request(
                       'post'], f"Incorrect method {method} for send_request()"
     url = make_api_url(verbose=verbose)
     headers = make_headers(verbose=verbose)
-    if verbose and data:
-        print('Data:\n' + json.dumps(data, indent=4) + '\n')
+    if verbose and json_data:
+        print('Data:\n' + json.dumps(json_data, indent=4) + '\n')
     # We must supply a return value during dryrun.
     res = requests.Response()
     if not dryrun:
@@ -96,7 +96,7 @@ def send_request(
         if method == 'get':
             res = requests.get(url, headers=headers)
         if method == 'put':
-            res = requests.put(url, headers=headers, data=data)
+            res = requests.put(url, headers=headers, json=json_data)
         if res.ok:
             if verbose:
                 print('Success!')
@@ -127,7 +127,7 @@ def update_record(
         ):
     """ Update a DNS record to hold a new value. """
     # Data
-    data = {
+    json_data = {
         'type': record_type,
         'name': hostname,
         'content': content,
@@ -136,7 +136,7 @@ def update_record(
     print("Sending request to update record...")
     send_request(
         'put',
-        data=data,
+        json_data=json_data,
         dryrun=dryrun,
         verbose=verbose
         )
