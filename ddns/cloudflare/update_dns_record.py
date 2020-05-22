@@ -34,6 +34,7 @@ def main(
         dryrun=False,
         verbose=False
         ):
+    """ Update a DNS record to match the current IP address. """
     if verbose:
         print(f"dryrun = {dryrun}")
     required_environment_variables = [
@@ -60,6 +61,7 @@ def main(
 
 
 def assert_env_vars(envs: List):
+    """ Checks a list of environment variables to make sure they are set. """
     unset_variables = []
     for e in envs:
         if not os.getenv(e):
@@ -76,6 +78,7 @@ def send_request(
         dryrun=False,
         verbose=False,
         ) -> requests.Response:
+    """ Sends an API request to Cloudflare. """
     assert method in ['get', 'put',
                       'post'], f"Incorrect method {method} for send_request()"
     url = make_api_url(verbose=verbose)
@@ -114,6 +117,7 @@ def update_record(
         ttl=3600,
         verbose=False,
         ):
+    """ Update a DNS record to hold a new value. """
     # Data
     data = {
         'type': record_type,
@@ -130,7 +134,9 @@ def update_record(
         )
 
 
+# TODO: The function name does not necessarily match its behaviour.
 def get_ip_from_record(dryrun=False, verbose=False) -> str:
+    """ Get the contents of a DNS record. """
     res = send_request(
         'get',
         dryrun=dryrun,
@@ -144,6 +150,7 @@ def get_ip_from_record(dryrun=False, verbose=False) -> str:
 
 
 def make_headers(verbose=False) -> dict:
+    """ Return a dict of properly formatted headers with token auth. """
     headers = {
         "Authorization": f"Bearer {os.getenv('CF_DNS_API_TOKEN')}",
         "Content-Type": "application/json"
@@ -155,6 +162,7 @@ def make_headers(verbose=False) -> dict:
 
 
 def make_api_url(verbose=False) -> str:
+    """ Return the API URL for the configured record. """
     # API endpoint
     api_endpoint = 'https://api.cloudflare.com/client/v4'
     api_path = pathlib.PurePath(
@@ -169,10 +177,9 @@ def make_api_url(verbose=False) -> str:
         print('URL:\n' + url + '\n')
     return url
 
-# Get current public IP
-
 
 def current_public_ip() -> str:
+    """ Get current public IP. """
     return requests.get('https://ipv4.icanhazip.com').text.strip()
 
 
