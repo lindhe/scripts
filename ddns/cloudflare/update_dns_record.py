@@ -77,7 +77,7 @@ def assert_env_vars(envs: List):
 
 def send_request(
         method: str,
-        data={},
+        data=None,
         dryrun=False,
         verbose=False,
         ) -> requests.Response:
