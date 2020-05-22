@@ -17,13 +17,16 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 
 """
 
+# Standard imports
 from typing import List
 import argparse
 import json
 import os
 import pathlib
-import requests
 import sys
+
+# External imports
+import requests
 
 
 def main(
