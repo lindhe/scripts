@@ -178,13 +178,27 @@ def current_public_ip() -> str:
 
 if __name__ == '__main__':
     # Bootstrapping
-    p = argparse.ArgumentParser(description="Updates a DNS record on Cloudflare")
+    p = argparse.ArgumentParser(
+        description="Updates a DNS record on Cloudflare")
     # Add cli arguments
     p.add_argument('--content', help="content of the hostname", required=True)
-    p.add_argument('--dryrun', help="run without sending any requests", action="store_true")
+    p.add_argument(
+        '--dryrun',
+        help="run without sending any requests",
+        action="store_true")
     p.add_argument('--hostname', help="hostname to update", required=True)
-    p.add_argument('--ttl', help="ttl in seconds for the DNS record (default: 3600)", default=3600)
-    p.add_argument('--type', help="record type (default: A)", choices=['A', 'AAAA', 'CNAME'], default='A')
+    p.add_argument(
+        '--ttl',
+        help="ttl in seconds for the DNS record (default: 3600)",
+        default=3600)
+    p.add_argument(
+        '--type',
+        help="record type (default: A)",
+        choices=[
+            'A',
+            'AAAA',
+            'CNAME'],
+        default='A')
     p.add_argument('--verbose', help="print more", action="store_true")
     # Run:
     args = p.parse_args()
