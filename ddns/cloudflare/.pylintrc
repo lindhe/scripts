@@ -1,0 +1,4 @@
+[MESSAGES CONTROL]
+
+# Disable the warnings for too many arguments
+disable=R0913
