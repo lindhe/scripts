@@ -171,32 +171,32 @@ def make_api_url(verbose=False) -> str:
     return url
 
 # Get current public IP
+
+
 def current_public_ip() -> str:
   return requests.get('https://ipv4.icanhazip.com').text.strip()
 
 
 if __name__ == '__main__':
-  # Bootstrapping
-  p = argparse.ArgumentParser(description="Updates a DNS record on Cloudflare")
-  # Add cli arguments
-  p.add_argument('--content', help="content of the hostname", required=True)
-  p.add_argument('--dryrun', help="run without sending any requests", action="store_true")
-  p.add_argument('--hostname', help="hostname to update", required=True)
-  p.add_argument('--ttl', help="ttl in seconds for the DNS record (default: 3600)", default=3600)
-  p.add_argument('--type', help="record type (default: A)", choices=['A', 'AAAA', 'CNAME'], default='A')
-  p.add_argument('--verbose', help="print more", action="store_true")
-  # Run:
-  args = p.parse_args()
-  try:
-    main(
-        content=args.content,
-        dryrun=args.dryrun,
-        hostname=args.hostname,
-        ttl=args.ttl,
-        record_type=args.ttl,
-        verbose=args.verbose
-        )
-  except KeyboardInterrupt:
-    sys.exit("\nInterrupted by ^C\n")
-
-
+    # Bootstrapping
+    p = argparse.ArgumentParser(description="Updates a DNS record on Cloudflare")
+    # Add cli arguments
+    p.add_argument('--content', help="content of the hostname", required=True)
+    p.add_argument('--dryrun', help="run without sending any requests", action="store_true")
+    p.add_argument('--hostname', help="hostname to update", required=True)
+    p.add_argument('--ttl', help="ttl in seconds for the DNS record (default: 3600)", default=3600)
+    p.add_argument('--type', help="record type (default: A)", choices=['A', 'AAAA', 'CNAME'], default='A')
+    p.add_argument('--verbose', help="print more", action="store_true")
+    # Run:
+    args = p.parse_args()
+    try:
+        main(
+            content=args.content,
+            dryrun=args.dryrun,
+            hostname=args.hostname,
+            ttl=args.ttl,
+            record_type=args.ttl,
+            verbose=args.verbose
+            )
+    except KeyboardInterrupt:
+        sys.exit("\nInterrupted by ^C\n")
