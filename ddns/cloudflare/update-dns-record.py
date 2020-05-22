@@ -71,39 +71,41 @@ def assert_env_vars(envs: List):
 
 
 def send_request(
-    method: str,
-    data={},
-    dryrun=False,
-    verbose=False,
-    ) -> requests.Response:
-  assert method in ['get', 'put', 'post'], f"Incorrect method {method} for send_request()"
-  url = make_api_url(verbose=verbose)
-  headers = make_headers(verbose=verbose)
-  if verbose and data:
-    print('Data:\n' + json.dumps(data, indent=4) + '\n')
-  if not dryrun:
-    if verbose:
-      print("Sending request...")
-    if method == 'get':
-      res = requests.get(url, headers=headers)
-    if method == 'put':
-      res = requests.put(url, headers=headers, data=data)
-    if res.ok:
-      if verbose:
-        print('Success!')
-        print('# Repsonse:\n' + res.json())
-    else:
-      rq = res.request
-      print('\n')
-      print('# Request:\n'
-          + 'Method: ' + str(rq.method) + '\n'
-          + 'URL: ' + str(rq.url) + '\n'
-          + 'Headers:\n' + str(rq.headers) + '\n'
-          , file=sys.stderr)
-      print('\n')
-      print('Repsonse:\n' + res.json(), file=sys.stderr)
-      sys.exit(f"ERROR: got an error when sending request.")
-  return res
+        method: str,
+        data={},
+        dryrun=False,
+        verbose=False,
+        ) -> requests.Response:
+    assert method in ['get', 'put',
+                      'post'], f"Incorrect method {method} for send_request()"
+    url = make_api_url(verbose=verbose)
+    headers = make_headers(verbose=verbose)
+    if verbose and data:
+        print('Data:\n' + json.dumps(data, indent=4) + '\n')
+    if not dryrun:
+        if verbose:
+            print("Sending request...")
+        if method == 'get':
+            res = requests.get(url, headers=headers)
+        if method == 'put':
+            res = requests.put(url, headers=headers, data=data)
+        if res.ok:
+            if verbose:
+                print('Success!')
+                print('# Repsonse:\n' + res.json())
+        else:
+            rq = res.request
+            print('\n')
+            print('# Request:\n'
+                  + 'Method: ' + str(rq.method) + '\n'
+                  + 'URL: ' + str(rq.url) + '\n'
+                  + 'Headers:\n' + str(rq.headers) + '\n'
+                , file=sys.stderr)
+            print('\n')
+            print('Repsonse:\n' + res.json(), file=sys.stderr)
+            sys.exit(f"ERROR: got an error when sending request.")
+    return res
+
 
 def update_record(
     content='',
