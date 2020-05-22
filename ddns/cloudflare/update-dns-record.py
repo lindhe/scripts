@@ -108,27 +108,28 @@ def send_request(
 
 
 def update_record(
-    content='',
-    dryrun=False,
-    hostname='',
-    record_type='A',
-    ttl=3600,
-    verbose=False,
-    ):
-  # Data
-  data = {
-      'type': record_type,
-      'name': hostname,
-      'content': content,
-      'ttl': ttl,
-      }
-  print("Sending request to update record...")
-  send_request(
-      'put',
-      data = data,
-      dryrun = dryrun,
-      verbose = verbose
-      )
+        content='',
+        dryrun=False,
+        hostname='',
+        record_type='A',
+        ttl=3600,
+        verbose=False,
+        ):
+    # Data
+    data = {
+        'type': record_type,
+        'name': hostname,
+        'content': content,
+        'ttl': ttl,
+        }
+    print("Sending request to update record...")
+    send_request(
+        'put',
+        data = data,
+        dryrun = dryrun,
+        verbose = verbose
+        )
+
 
 def get_ip_from_record(dryrun=False, verbose=False) -> str:
     res = send_request(
