@@ -104,7 +104,8 @@ def send_request(
         if res.ok:
             if verbose:
                 print('Success!')
-                print('# Repsonse:\n' + res.json())
+                print('# Repsonse:')
+                print(res.json())
         else:
             request = res.request
             print('\n')
@@ -114,7 +115,8 @@ def send_request(
                   + 'Headers:\n' + str(request.headers)
                   + '\n', file=sys.stderr)
             print('\n')
-            print('Repsonse:\n' + res.json(), file=sys.stderr)
+            print('Repsonse:', file=sys.stderr)
+            print(res.json(), file=sys.stderr)
             sys.exit("ERROR: got an error when sending request.")
     return res
 
