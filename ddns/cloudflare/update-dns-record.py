@@ -26,13 +26,14 @@ import requests
 import sys
 
 
-def main(content='',
-    hostname='',
-    ttl=3600,
-    record_type='A',
-    dryrun=False,
-    verbose=False
-    ):
+def main(
+        content='',
+        hostname='',
+        ttl=3600,
+        record_type='A',
+        dryrun=False,
+        verbose=False
+        ):
   if verbose:
     print(f"dryrun = {dryrun}")
   required_environment_variables = [
