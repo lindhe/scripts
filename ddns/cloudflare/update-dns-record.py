@@ -174,7 +174,7 @@ def make_api_url(verbose=False) -> str:
 
 
 def current_public_ip() -> str:
-  return requests.get('https://ipv4.icanhazip.com').text.strip()
+    return requests.get('https://ipv4.icanhazip.com').text.strip()
 
 
 if __name__ == '__main__':
