@@ -88,6 +88,8 @@ def send_request(
     headers = make_headers(verbose=verbose)
     if verbose and data:
         print('Data:\n' + json.dumps(data, indent=4) + '\n')
+    # We must supply a return value during dryrun.
+    res = requests.Response()
     if not dryrun:
         if verbose:
             print("Sending request...")
