@@ -9,7 +9,6 @@ jobs:
       steps:
         - checkout  # checkout source code to working directory
         - run:
-            name: Install and lint
             command: |  # use pipenv to install dependencies
               sudo pip install pipenv
               pipenv install --dev
