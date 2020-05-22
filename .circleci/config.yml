@@ -6,7 +6,7 @@ orbs:
 jobs:
   lint:
     working_directory: ~/ddns/cloudflare/
-      steps:
+    steps:
       - checkout  # checkout source code to working directory
       - run:
           command: |  # use pipenv to install dependencies
