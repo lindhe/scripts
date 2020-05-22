@@ -111,7 +111,8 @@ def send_request(
             print('# Request:\n'
                   + 'Method: ' + str(request.method) + '\n'
                   + 'URL: ' + str(request.url) + '\n'
-                  + 'Headers:\n' + str(request.headers) + '\n', file=sys.stderr)
+                  + 'Headers:\n' + str(request.headers)
+                  + '\n', file=sys.stderr)
             print('\n')
             print('Repsonse:\n' + res.json(), file=sys.stderr)
             sys.exit("ERROR: got an error when sending request.")
