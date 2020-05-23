@@ -47,8 +47,8 @@ def main(
         ]
     assert_env_vars(required_environment_variables)
     # Compare IP to avoid updating unnecessarily
-    my_ip = ip_address or current_public_ip(verbose=verbose)
-    record_ip = get_record_content(dryrun=dryrun, verbose=verbose)
+    my_ip: str = ip_address or current_public_ip(verbose=verbose)
+    record_ip: str = get_record_content(dryrun=dryrun, verbose=verbose)
     # Only update record if the IPxs differ
     if my_ip != record_ip:
         if verbose:
@@ -86,8 +86,8 @@ def send_request(
     """ Sends an API request to Cloudflare. """
     assert method in ['get', 'put',
                       'post'], f"Incorrect method {method} for send_request()"
-    url = make_api_url(verbose=verbose)
-    headers = make_headers(verbose=verbose)
+    url: str = make_api_url(verbose=verbose)
+    headers: dict = make_headers(verbose=verbose)
     if verbose and json_data:
         print('Data:\n' + json.dumps(json_data, indent=4) + '\n')
     # We must supply a return value during dryrun.
