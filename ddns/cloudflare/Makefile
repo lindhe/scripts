@@ -5,14 +5,14 @@ init:
 	pipenv install --dev
 
 build:
-	pipenv run pyinstaller ./update_dns_record.py
+	pipenv run pyinstaller --onefile --distpath=. ./update_dns_record.py
 
 test:
 	pipenv run mypy ./update_dns_record.py
 	pipenv run pylint ./update_dns_record.py
 
 clean:
-	rm -r dist build update_dns_record.spec
+	rm -r build update_dns_record.spec
 
 install:
-	install ./dist/update_dns_record/update_dns_record /usr/local/bin/
+	install ./update_dns_record /usr/local/bin/

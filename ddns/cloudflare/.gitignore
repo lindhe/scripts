@@ -4,3 +4,4 @@
 dist/
 build/
 *.spec
+update_dns_record
