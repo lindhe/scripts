@@ -48,10 +48,10 @@ def main(
         'CF_DNS_RECORD_ID'
         ]
     assert_env_vars(required_environment_variables)
+    dns_record = get_record_json(hostname, dryrun=dryrun, verbose=verbose)
+    record_content: str = dns_record['result']['content']
     # Compare IP to avoid updating unnecessarily
     my_ip: str = ip_address or current_public_ip(verbose=verbose)
-    record_content: str = get_record_content(hostname, dryrun=dryrun,
-                                             verbose=verbose)
     # Only update record if the IPxs differ
     if my_ip != record_content:
         if verbose:
@@ -153,21 +153,45 @@ def update_record(
           f" to point to {content}")
 
 
-def get_record_content(hostname: str, dryrun=False, verbose=False) -> str:
-    """ Get the contents of a DNS record. """
+def get_record_json(hostname: str, dryrun=False, verbose=False) -> dict:
+    """ Gets a DNS record. """
     if verbose:
-        print("Getting current record contents...")
-    res = send_request(
-        'get',
-        hostname,
-        dryrun=dryrun,
-        verbose=verbose
-        )
-    # Setting ip to return something during dryrun
-    ip_address = '127.0.0.1'
+        print("Getting DNS record...")
+    # Dummy record to return on dryrun
+    record_json = {  # {{{
+        'result': {
+            'id': '372e67954025e0ba6aaa6d586b9e0b59',
+            'zone_id': '023e105f4ecef8ad9ca31a8372d0c353',
+            'zone_name': 'example.com',
+            'name': hostname,
+            'type': 'A',
+            'content': '127.0.0.1',
+            'proxiable': True,
+            'proxied': False,
+            'ttl': 3600,
+            'locked': False,
+            'meta': {
+                'auto_added': False,
+                'managed_by_apps': False,
+                'managed_by_argo_tunnel': False,
+                'source': 'primary'
+            },
+            'created_on': '2020-05-23T10:36:08.607086Z',
+            'modified_on': '2020-05-23T10:36:08.607086Z'
+        },
+        'success': True,
+        'errors': [],
+        'messages': []
+    }
+# }}}
     if not dryrun:
-        ip_address = res.json()['result']['content']
-    return ip_address
+        record_json = send_request(
+            'get',
+            hostname,
+            dryrun=dryrun,
+            verbose=verbose
+        ).json()
+    return record_json
 
 
 def make_headers(verbose=False) -> dict:
