@@ -189,7 +189,7 @@ def make_api_url(hostname: str, dryrun=False, verbose=False) -> str:
     # API endpoint
     api_path = pathlib.PurePath(
         'zones',
-        str(os.getenv('CF_DNS_ZONE_ID')),
+        get_zone_id(dryrun=dryrun, verbose=verbose),
         'dns_records',
         get_record_id(hostname, dryrun=dryrun, verbose=verbose)
         )
@@ -207,6 +207,16 @@ def get_record_id(hostname: str, dryrun=False, verbose=False) -> str:
         if dryrun:
             print(f"Picking dummy value for Record ID: {dummy_id}")
     return dummy_id if dryrun else str(os.getenv('CF_DNS_RECORD_ID'))
+
+
+def get_zone_id(dryrun=False, verbose=False) -> str:
+    """ Return the Zone ID for the configured zone. """
+    dummy_id = '023e105f4ecef8ad9ca31a8372d0c353'
+    if verbose:
+        print("Getting Zone ID...")
+        if dryrun:
+            print(f"Picking dummy value for Zone ID: {dummy_id}")
+    return dummy_id if dryrun else str(os.getenv('CF_DNS_ZONE_ID'))
 
 
 def current_public_ip(verbose=False) -> str:
