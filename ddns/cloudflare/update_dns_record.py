@@ -16,6 +16,9 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 
 """
 
+__version__ = '1.0.0'
+__author__ = 'Andreas Lindhé'
+
 # Standard imports
 from typing import List
 import argparse
@@ -302,6 +305,7 @@ if __name__ == '__main__':
             'CNAME'],
         default='A')
     p.add_argument('--verbose', help="print more", action="store_true")
+    p.add_argument('--version', action='version', version=__version__)
     # Run:
     args = p.parse_args()
     try:
