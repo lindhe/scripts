@@ -48,7 +48,8 @@ def main(
     assert_env_vars(required_environment_variables)
     # Compare IP to avoid updating unnecessarily
     my_ip: str = ip_address or current_public_ip(verbose=verbose)
-    record_content: str = get_record_content(dryrun=dryrun, verbose=verbose)
+    record_content: str = get_record_content(hostname, dryrun=dryrun,
+                                             verbose=verbose)
     # Only update record if the IPxs differ
     if my_ip != record_content:
         if verbose:
@@ -79,6 +80,7 @@ def assert_env_vars(envs: List):
 
 def send_request(
         method: str,
+        hostname: str,
         json_data=None,
         dryrun=False,
         verbose=False,
@@ -86,7 +88,7 @@ def send_request(
     """ Sends an API request to Cloudflare. """
     assert method in ['get', 'put',
                       'post'], f"Incorrect method {method} for send_request()"
-    url: str = make_api_url(verbose=verbose)
+    url: str = make_api_url(hostname, dryrun=dryrun, verbose=verbose)
     headers: dict = make_headers(verbose=verbose)
     if verbose and json_data:
         print('Data:\n' + json.dumps(json_data, indent=4) + '\n')
@@ -140,6 +142,7 @@ def update_record(
         print("Sending request to update record...")
     send_request(
         'put',
+        hostname,
         json_data=json_data,
         dryrun=dryrun,
         verbose=verbose
@@ -148,12 +151,13 @@ def update_record(
           f" to point to {content}")
 
 
-def get_record_content(dryrun=False, verbose=False) -> str:
+def get_record_content(hostname: str, dryrun=False, verbose=False) -> str:
     """ Get the contents of a DNS record. """
     if verbose:
         print("Getting current record contents...")
     res = send_request(
         'get',
+        hostname,
         dryrun=dryrun,
         verbose=verbose
         )
@@ -178,7 +182,7 @@ def make_headers(verbose=False) -> dict:
     return headers
 
 
-def make_api_url(verbose=False) -> str:
+def make_api_url(hostname: str, dryrun=False, verbose=False) -> str:
     """ Return the API URL for the configured record. """
     # API endpoint
     api_endpoint = 'https://api.cloudflare.com/client/v4'
@@ -186,12 +190,22 @@ def make_api_url(verbose=False) -> str:
         'zones',
         str(os.getenv('CF_DNS_ZONE_ID')),
         'dns_records',
-        str(os.getenv('CF_DNS_RECORD_ID'))
+        get_record_id(hostname, dryrun=dryrun, verbose=verbose)
         )
     url = f"{api_endpoint}/{str(api_path)}"
     if verbose:
         print('URL: ' + url)
     return url
+
+
+def get_record_id(hostname: str, dryrun=False, verbose=False) -> str:
+    """ Return the Record ID for a hostname in the configured zone. """
+    dummy_id = '372e67954025e0ba6aaa6d586b9e0b59'
+    if verbose:
+        print(f"Getting Record ID for {hostname}")
+        if dryrun:
+            print(f"Picking dummy value for Record ID: {dummy_id}")
+    return dummy_id if dryrun else str(os.getenv('CF_DNS_RECORD_ID'))
 
 
 def current_public_ip(verbose=False) -> str:
