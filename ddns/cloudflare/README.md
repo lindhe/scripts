@@ -7,6 +7,7 @@ I'm moving from Loopia to Cloudflare, and need a new script that updates my DNS 
 * python3.7
 * python3.7-dev
 * python3-pip
+* gcc
 * pipenv
 
 ## Installation
