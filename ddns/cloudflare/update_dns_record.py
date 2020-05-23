@@ -47,7 +47,7 @@ def main(
         ]
     assert_env_vars(required_environment_variables)
     # Compare IP to avoid updating unnecessarily
-    my_ip = ip_address or current_public_ip()
+    my_ip = ip_address or current_public_ip(verbose=verbose)
     record_ip = get_record_content(dryrun=dryrun, verbose=verbose)
     # Only update record if the IPxs differ
     if my_ip != record_ip:
@@ -61,6 +61,8 @@ def main(
             ttl=ttl,
             verbose=verbose
             )
+    else:
+        print('DNS record unchanged.')
 
 
 def assert_env_vars(envs: List):
@@ -92,7 +94,7 @@ def send_request(
     res = requests.Response()
     if not dryrun:
         if verbose:
-            print("Sending request...")
+            print("Sending {} request...".format(method.upper()))
         if method == 'get':
             res = requests.get(url, headers=headers)
         if method == 'put':
@@ -104,13 +106,13 @@ def send_request(
                 print(res.json())
         else:
             request = res.request
-            print('\n')
+            print('\n', file=sys.stderr)
             print('# Request:\n'
                   + 'Method: ' + str(request.method) + '\n'
                   + 'URL: ' + str(request.url) + '\n'
                   + 'Headers:\n' + str(request.headers)
                   + '\n', file=sys.stderr)
-            print('\n')
+            print('\n', file=sys.stderr)
             print('Repsonse:', file=sys.stderr)
             print(res.json(), file=sys.stderr)
             sys.exit("ERROR: got an error when sending request.")
@@ -133,17 +135,22 @@ def update_record(
         'content': content,
         'ttl': ttl,
         }
-    print("Sending request to update record...")
+    if verbose:
+        print("Sending request to update record...")
     send_request(
         'put',
         json_data=json_data,
         dryrun=dryrun,
         verbose=verbose
         )
+    print(f"Successfully updated DNS record of {hostname}" +
+          f" to point to {content}")
 
 
 def get_record_content(dryrun=False, verbose=False) -> str:
     """ Get the contents of a DNS record. """
+    if verbose:
+        print("Getting current record contents...")
     res = send_request(
         'get',
         dryrun=dryrun,
@@ -163,8 +170,10 @@ def make_headers(verbose=False) -> dict:
         "Content-Type": "application/json"
         }
     if verbose:
-        print('\n')
-        print('Headers:\n' + json.dumps(headers, indent=4) + '\n')
+        # Redacting token as to not print it in the logs
+        censored_headers = dict(headers)
+        censored_headers['Authorization'] = "Bearer ***"
+        print('Headers:\n' + json.dumps(censored_headers, indent=4) + '\n')
     return headers
 
 
@@ -180,13 +189,14 @@ def make_api_url(verbose=False) -> str:
         )
     url = f"{api_endpoint}/{str(api_path)}"
     if verbose:
-        print('\n')
-        print('URL:\n' + url + '\n')
+        print('URL: ' + url)
     return url
 
 
-def current_public_ip() -> str:
+def current_public_ip(verbose=False) -> str:
     """ Get current public IP. """
+    if verbose:
+        print("Looking up current IP address for this host...")
     return requests.get('https://ipv4.icanhazip.com').text.strip()
 
 
