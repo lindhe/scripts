@@ -12,8 +12,7 @@ pipenv run ./update-dns-record.py -h
 ## Type checking and lint:
 
 ```shell
-pipenv run mypy ./update-dns-record.py
-pipenv run pylint ./update-dns-record.py
+make test
 ```
 
 ## Dryrun
