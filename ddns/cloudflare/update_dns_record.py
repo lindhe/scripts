@@ -10,7 +10,6 @@ This script helps you to update a DNS recrod that lives on Cloudflare.
 Before running, make sure you have set the following environment variables:
 CF_DNS_API_TOKEN
 CF_DNS_ZONE_ID
-CF_DNS_RECORD_ID
 
 Documentation about the API can be found here:
 https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
@@ -45,7 +44,6 @@ def main(
     required_environment_variables = [
         'CF_DNS_API_TOKEN',
         'CF_DNS_ZONE_ID',
-        'CF_DNS_RECORD_ID'
         ]
     assert_env_vars(required_environment_variables)
     dns_record = get_record_json(hostname, record_type=record_type,
@@ -230,15 +228,44 @@ def make_api_url(hostname: str, record_type='A',
     return url
 
 
+# TODO: refactor this! Duplicated code with send_request()
 def get_record_id(hostname: str, record_type='A',
                   dryrun=False, verbose=False) -> str:
     """ Return the Record ID for a hostname in the configured zone. """
-    dummy_id = '372e67954025e0ba6aaa6d586b9e0b59'
     if verbose:
         print(f"Getting Record ID for {hostname}")
-        if dryrun:
-            print(f"Picking dummy value for Record ID: {dummy_id}")
-    return dummy_id if dryrun else str(os.getenv('CF_DNS_RECORD_ID'))
+    if dryrun:
+        record_id = '372e67954025e0ba6aaa6d586b9e0b59'
+        if verbose:
+            print(f"Picking dummy value for Record ID: {record_id}")
+    if not dryrun:
+        zone_id: str = get_zone_id(dryrun=dryrun, verbose=verbose)
+        url = f"{API_ENDPOINT}/zones/{zone_id}/dns_records"
+        query = {'type': record_type, 'name': hostname}
+        res = requests.get(url, params=query, headers=make_headers())
+        if res.ok:
+            if verbose:
+                print('Successfully got Record ID!')
+                print('# Repsonse:')
+                print(res.json())
+        else:
+            request = res.request
+            print('\n', file=sys.stderr)
+            print('# Request:\n'
+                  + 'Method: ' + str(request.method) + '\n'
+                  + 'URL: ' + str(request.url) + '\n'
+                  + 'Headers:\n' + str(request.headers)
+                  + '\n', file=sys.stderr)
+            print('\n', file=sys.stderr)
+            print('Repsonse:', file=sys.stderr)
+            print(res.json(), file=sys.stderr)
+            sys.exit("ERROR when fetching Record ID")
+        # TODO: we get a list of records. Would be nice to know that there's
+        # only one item in the list...
+        record_id = res.json()['result'][0]['id']
+        if verbose:
+            print(f"Record ID for {hostname} is {record_id}")
+    return record_id
 
 
 def get_zone_id(dryrun=False, verbose=False) -> str:
