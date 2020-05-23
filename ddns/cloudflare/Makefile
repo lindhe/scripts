@@ -13,3 +13,6 @@ test:
 
 clean:
 	rm -r dist build update_dns_record.spec
+
+install:
+	install ./dist/update_dns_record/update_dns_record /usr/local/bin/
