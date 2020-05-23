@@ -48,9 +48,9 @@ def main(
     assert_env_vars(required_environment_variables)
     # Compare IP to avoid updating unnecessarily
     my_ip: str = ip_address or current_public_ip(verbose=verbose)
-    record_ip: str = get_record_content(dryrun=dryrun, verbose=verbose)
+    record_content: str = get_record_content(dryrun=dryrun, verbose=verbose)
     # Only update record if the IPxs differ
-    if my_ip != record_ip:
+    if my_ip != record_content:
         if verbose:
             print('Current IP differs from DNS record.')
         update_record(
