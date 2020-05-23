@@ -82,16 +82,18 @@ def assert_env_vars(envs: List):
 def send_request(
         method: str,
         hostname: str,
+        api_url='',
         json_data=None,
         record_type='A',
+        parameters=None,
         dryrun=False,
         verbose=False,
         ) -> requests.Response:
     """ Sends an API request to Cloudflare. """
     assert method in ['get', 'put',
                       'post'], f"Incorrect method {method} for send_request()"
-    url: str = make_api_url(hostname, record_type=record_type,
-                            dryrun=dryrun, verbose=verbose)
+    url: str = api_url or make_api_url(hostname, record_type=record_type,
+                                       dryrun=dryrun, verbose=verbose)
     headers: dict = make_headers(verbose=verbose)
     if verbose and json_data:
         print('Data:\n' + json.dumps(json_data, indent=4) + '\n')
@@ -101,7 +103,7 @@ def send_request(
         if verbose:
             print("Sending {} request...".format(method.upper()))
         if method == 'get':
-            res = requests.get(url, headers=headers)
+            res = requests.get(url, headers=headers, params=parameters)
         if method == 'put':
             res = requests.put(url, headers=headers, json=json_data)
         if res.ok:
@@ -228,7 +230,6 @@ def make_api_url(hostname: str, record_type='A',
     return url
 
 
-# TODO: refactor this! Duplicated code with send_request()
 def get_record_id(hostname: str, record_type='A',
                   dryrun=False, verbose=False) -> str:
     """ Return the Record ID for a hostname in the configured zone. """
@@ -242,24 +243,14 @@ def get_record_id(hostname: str, record_type='A',
         zone_id: str = get_zone_id(dryrun=dryrun, verbose=verbose)
         url = f"{API_ENDPOINT}/zones/{zone_id}/dns_records"
         query = {'type': record_type, 'name': hostname}
-        res = requests.get(url, params=query, headers=make_headers())
-        if res.ok:
-            if verbose:
-                print('Successfully got Record ID!')
-                print('# Repsonse:')
-                print(res.json())
-        else:
-            request = res.request
-            print('\n', file=sys.stderr)
-            print('# Request:\n'
-                  + 'Method: ' + str(request.method) + '\n'
-                  + 'URL: ' + str(request.url) + '\n'
-                  + 'Headers:\n' + str(request.headers)
-                  + '\n', file=sys.stderr)
-            print('\n', file=sys.stderr)
-            print('Repsonse:', file=sys.stderr)
-            print(res.json(), file=sys.stderr)
-            sys.exit("ERROR when fetching Record ID")
+        res = send_request('get',
+                           hostname,
+                           api_url=url,
+                           record_type=record_type,
+                           parameters=query,
+                           dryrun=dryrun,
+                           verbose=verbose,
+                           )
         # TODO: we get a list of records. Would be nice to know that there's
         # only one item in the list...
         record_id = res.json()['result'][0]['id']
