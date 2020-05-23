@@ -2,6 +2,13 @@
 
 I'm moving from Loopia to Cloudflare, and need a new script that updates my DNS for me, since I don't have static IP.
 
+## Prerequisites
+
+* python3.7
+* python3.7-dev
+* python3-pip
+* pipenv
+
 ## Installation
 
 ```shell
