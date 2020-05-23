@@ -28,6 +28,8 @@ import sys
 # External imports
 import requests
 
+API_ENDPOINT = 'https://api.cloudflare.com/client/v4'
+
 
 def main(
         hostname='',
@@ -185,14 +187,13 @@ def make_headers(verbose=False) -> dict:
 def make_api_url(hostname: str, dryrun=False, verbose=False) -> str:
     """ Return the API URL for the configured record. """
     # API endpoint
-    api_endpoint = 'https://api.cloudflare.com/client/v4'
     api_path = pathlib.PurePath(
         'zones',
         str(os.getenv('CF_DNS_ZONE_ID')),
         'dns_records',
         get_record_id(hostname, dryrun=dryrun, verbose=verbose)
         )
-    url = f"{api_endpoint}/{str(api_path)}"
+    url = f"{API_ENDPOINT}/{str(api_path)}"
     if verbose:
         print('URL: ' + url)
     return url
