@@ -16,7 +16,7 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 
 """
 
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 __author__ = 'Andreas Lindhé'
 
 # Standard imports
@@ -39,10 +39,11 @@ def main(
         ttl=3600,
         record_type='A',
         dryrun=False,
-        verbose=False
+        verbose=None
         ):
     """ Update a DNS record to match the current IP address. """
-    if verbose:
+    if verbose == 2:
+        print(f"Version: {__version__}")
         print(f"dryrun = {dryrun}")
     required_environment_variables = [
         'CF_DNS_API_TOKEN',
@@ -56,7 +57,7 @@ def main(
     my_ip: str = ip_address or current_public_ip(verbose=verbose)
     # Only update record if the IPxs differ
     if my_ip != record_content:
-        if verbose:
+        if verbose == 1:
             print('Current IP differs from DNS record.')
         update_record(
             content=my_ip,
@@ -67,7 +68,8 @@ def main(
             verbose=verbose
             )
     else:
-        print('DNS record unchanged.')
+        if verbose == 1:
+            print('DNS record unchanged.')
 
 
 def assert_env_vars(envs: List):
@@ -90,7 +92,7 @@ def send_request(
         record_type='A',
         parameters=None,
         dryrun=False,
-        verbose=False,
+        verbose=None,
         ) -> requests.Response:
     """ Sends an API request to Cloudflare. """
     assert method in ['get', 'put',
@@ -103,14 +105,14 @@ def send_request(
     # We must supply a return value during dryrun.
     res = requests.Response()
     if not dryrun:
-        if verbose:
+        if verbose == 3:
             print("Sending {} request...".format(method.upper()))
         if method == 'get':
             res = requests.get(url, headers=headers, params=parameters)
         if method == 'put':
             res = requests.put(url, headers=headers, json=json_data)
         if res.ok:
-            if verbose:
+            if verbose == 3:
                 print('Success!')
                 print('# Repsonse:')
                 print(res.json())
@@ -135,7 +137,7 @@ def update_record(
         hostname='',
         record_type='A',
         ttl=3600,
-        verbose=False,
+        verbose=None,
         ):
     """ Update a DNS record to hold a new value. """
     # Data
@@ -146,7 +148,7 @@ def update_record(
         'ttl': ttl,
         'proxied': False,
         }
-    if verbose:
+    if verbose == 2:
         print("Sending request to update record...")
     send_request(
         'put',
@@ -160,9 +162,9 @@ def update_record(
 
 
 def get_record_json(hostname: str, record_type='A',
-                    dryrun=False, verbose=False) -> dict:
+                    dryrun=False, verbose=None) -> dict:
     """ Gets a DNS record. """
-    if verbose:
+    if verbose == 2:
         print("Getting DNS record...")
     # Dummy record to return on dryrun
     record_json = {  # {{{
@@ -202,13 +204,13 @@ def get_record_json(hostname: str, record_type='A',
     return record_json
 
 
-def make_headers(verbose=False) -> dict:
+def make_headers(verbose=None) -> dict:
     """ Return a dict of properly formatted headers with token auth. """
     headers = {
         "Authorization": f"Bearer {os.getenv('CF_DNS_API_TOKEN')}",
         "Content-Type": "application/json"
         }
-    if verbose:
+    if verbose == 3:
         # Redacting token as to not print it in the logs
         censored_headers = dict(headers)
         censored_headers['Authorization'] = "Bearer ***"
@@ -217,7 +219,7 @@ def make_headers(verbose=False) -> dict:
 
 
 def make_api_url(hostname: str, record_type='A',
-                 dryrun=False, verbose=False) -> str:
+                 dryrun=False, verbose=None) -> str:
     """ Return the API URL for the configured record. """
     # API endpoint
     api_path = pathlib.PurePath(
@@ -228,19 +230,19 @@ def make_api_url(hostname: str, record_type='A',
                       dryrun=dryrun, verbose=verbose)
         )
     url = f"{API_ENDPOINT}/{str(api_path)}"
-    if verbose:
+    if verbose == 3:
         print('URL: ' + url)
     return url
 
 
 def get_record_id(hostname: str, record_type='A',
-                  dryrun=False, verbose=False) -> str:
+                  dryrun=False, verbose=None) -> str:
     """ Return the Record ID for a hostname in the configured zone. """
-    if verbose:
+    if verbose == 3:
         print(f"Getting Record ID for {hostname}")
     if dryrun:
         record_id = '372e67954025e0ba6aaa6d586b9e0b59'
-        if verbose:
+        if verbose == 2:
             print(f"Picking dummy value for Record ID: {record_id}")
     if not dryrun:
         zone_id: str = get_zone_id(dryrun=dryrun, verbose=verbose)
@@ -257,26 +259,29 @@ def get_record_id(hostname: str, record_type='A',
         # TODO: we get a list of records. Would be nice to know that there's
         # only one item in the list...
         record_id = res.json()['result'][0]['id']
-        if verbose:
+        if verbose == 2:
             print(f"Record ID for {hostname} is {record_id}")
     return record_id
 
 
-def get_zone_id(dryrun=False, verbose=False) -> str:
+def get_zone_id(dryrun=False, verbose=None) -> str:
     """ Return the Zone ID for the configured zone. """
     dummy_id = '023e105f4ecef8ad9ca31a8372d0c353'
-    if verbose:
+    if verbose == 3:
         print("Getting Zone ID...")
         if dryrun:
             print(f"Picking dummy value for Zone ID: {dummy_id}")
     return dummy_id if dryrun else str(os.getenv('CF_DNS_ZONE_ID'))
 
 
-def current_public_ip(verbose=False) -> str:
+def current_public_ip(verbose=None) -> str:
     """ Get current public IP. """
-    if verbose:
+    if verbose == 2:
         print("Looking up current IP address for this host...")
-    return requests.get('https://ipv4.icanhazip.com').text.strip()
+    ip_address: str = requests.get('https://ipv4.icanhazip.com').text.strip()
+    if verbose == 2:
+        print(ip_address)
+    return ip_address
 
 
 if __name__ == '__main__':
@@ -304,7 +309,8 @@ if __name__ == '__main__':
             'AAAA',
             'CNAME'],
         default='A')
-    p.add_argument('--verbose', help="print more", action="store_true")
+    p.add_argument('-v', '--verbose', help="verbosity level [-v|-vv|-vvv]",
+                   action="count")
     p.add_argument('--version', action='version', version=__version__)
     # Run:
     args = p.parse_args()
