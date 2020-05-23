@@ -134,6 +134,7 @@ def update_record(
         'name': hostname,
         'content': content,
         'ttl': ttl,
+        'proxied': False,
         }
     if verbose:
         print("Sending request to update record...")
