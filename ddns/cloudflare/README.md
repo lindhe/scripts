@@ -27,3 +27,11 @@ CF_DNS_API_TOKEN='YQSn-xWAQiiEh9qM58wZNnyQS7FUdoqGIUAbrh7T' CF_DNS_ZONE_ID='023e
 ```shell
 curl -X GET "https://api.cloudflare.com/client/v4/zones/${CF_DNS_ZONE_ID}/dns_records?type=A&name=test.lindhe.io" -H "Authorization: Bearer ${CF_DNS_API_TOKEN}" -H "Content-Type: application/json"
 ```
+
+## Build portable binary
+
+```shell
+make
+```
+
+The binary will be located in ./dist/update_dns_record/update_dns_record
