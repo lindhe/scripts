@@ -1,5 +1,8 @@
 .mypy_cache/
 
+# Snap
+lindhe-cloudflare-ddns_*_amd64.snap
+
 # pyinstaller
 dist/
 build/
