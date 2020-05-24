@@ -5,12 +5,15 @@ init:
 	pipenv install --dev
 
 build:
-	pipenv run pyinstaller --onefile --distpath=. ./update_dns_record.py
+	pipenv run pyinstaller --onefile --distpath=./bin ./update_dns_record.py
 
 test:
 	pipenv run mypy ./update_dns_record.py
 	pipenv run pylint ./update_dns_record.py
 	./tests.sh
+
+package:
+	snapcraft --debug
 
 clean:
 	rm -r build update_dns_record.spec

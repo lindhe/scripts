@@ -9,6 +9,11 @@ grade: devel
 confinement: devmode # use 'strict' once you have the right plugs and slots
 
 parts:
-  my-part:
-    # See 'snapcraft plugins'
-    plugin: nil
+  lindhe-cloudflare-ddns:
+    plugin: python
+    python-version: python3
+    source: .
+
+apps:
+  lindhe-cloudflare-ddns:
+    command: update_dns_record
