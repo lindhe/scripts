@@ -10,6 +10,7 @@ build:
 test:
 	pipenv run mypy ./update_dns_record.py
 	pipenv run pylint ./update_dns_record.py
+	./tests.sh
 
 clean:
 	rm -r build update_dns_record.spec
