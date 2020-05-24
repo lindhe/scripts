@@ -16,4 +16,4 @@ parts:
 
 apps:
   lindhe-cloudflare-ddns:
-    command: update_dns_record
+    command: bin/update_dns_record.py
