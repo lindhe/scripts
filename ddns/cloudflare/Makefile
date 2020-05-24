@@ -14,7 +14,7 @@ test:
 
 package:
 	pipenv run pipenv_to_requirements
-	snapcraft --debug
+	snapcraft
 
 clean:
 	rm -rf build update_dns_record.spec lindhe-cloudflare-ddns_*_amd64.snap requirements*.txt
