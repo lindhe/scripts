@@ -8,6 +8,7 @@ mypy = "*"
 pylint = "*"
 pyinstaller = "*"
 setuptools = "*"
+pipenv-to-requirements = "*"
 
 [packages]
 requests = "*"
