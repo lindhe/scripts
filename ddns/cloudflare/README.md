@@ -43,6 +43,16 @@ Note that these are just dummy values.
 CF_DNS_API_TOKEN='YQSn-xWAQiiEh9qM58wZNnyQS7FUdoqGIUAbrh7T' CF_DNS_ZONE_ID='023e105f4ecef8ad9ca31a8372d0c353' ./update_dns_record.py --hostname example.com --content 127.0.0.1 --verbose --dryrun
 ```
 
+## Snap
+
+In a vain try to make this easier to install on more systems, I've made an effort to package it using snap.
+The workflow might look something like this:
+
+1. `make package`
+1. `sudo snap install lindhe-cloudflare-ddns_1.1.0_amd64.snap`
+1. `lindhe-cloudflare-ddns --help`
+1. `sudo snap remove lindhe-cloudflare-ddns`
+
 ## Security notices
 
 This script uses https://ipv4.icanhazip.com for IP lookups.
