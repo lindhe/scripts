@@ -13,6 +13,7 @@ test:
 	./tests.sh
 
 package:
+	pipenv run pipenv_to_requirements
 	snapcraft --debug
 
 clean:

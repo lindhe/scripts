@@ -12,6 +12,8 @@ parts:
   lindhe-cloudflare-ddns:
     plugin: python
     python-version: python3
+    requirements:
+      - ./requirements.txt
     source: .
 
 apps:
