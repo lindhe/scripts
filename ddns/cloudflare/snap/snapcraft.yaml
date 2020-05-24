@@ -5,8 +5,8 @@ summary: A DDNS client for Cloudflare DNS
 description: |
   I made this script to be run as a cronjob that updates my DNS whenever the
   static IP changes.
-grade: devel
-confinement: devmode # use 'strict' once you have the right plugs and slots
+grade: stable
+confinement: strict
 
 parts:
   lindhe-cloudflare-ddns:
