@@ -2,6 +2,7 @@
 
 # Snap
 lindhe-cloudflare-ddns_*_amd64.snap
+requirements*.txt
 
 # pyinstaller
 dist/
