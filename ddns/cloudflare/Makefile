@@ -17,7 +17,8 @@ package:
 	snapcraft --debug
 
 clean:
-	rm -r build update_dns_record.spec
+	rm -rf build update_dns_record.spec lindhe-cloudflare-ddns_*_amd64.snap requirements*.txt
+	snapcraft clean
 
 install:
 	install ./update_dns_record /usr/local/bin/
