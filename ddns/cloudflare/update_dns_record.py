@@ -16,7 +16,7 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 
 """
 
-__version__ = '1.1.1'
+__version__ = '1.1.2'
 __author__ = 'Andreas Lindhé'
 
 # Standard imports
@@ -126,7 +126,7 @@ def send_request(
                   + '\n', file=sys.stderr)
             print('\n', file=sys.stderr)
             print('Repsonse:', file=sys.stderr)
-            print(res.json(), file=sys.stderr)
+            print(res.text, file=sys.stderr)
             sys.exit("ERROR: got an error when sending request.")
     return res
 
