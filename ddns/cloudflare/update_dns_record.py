@@ -16,7 +16,7 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 
 """
 
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 __author__ = 'Andreas Lindhé'
 
 # Standard imports
