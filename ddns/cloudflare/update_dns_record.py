@@ -122,7 +122,7 @@ def send_request(
             print('# Request:\n'
                   + 'Method: ' + str(request.method) + '\n'
                   + 'URL: ' + str(request.url) + '\n'
-                  + 'Headers:\n' + str(request.headers)
+                  + 'Headers:\n' + str(censor_headers(dict(request.headers)))
                   + '\n', file=sys.stderr)
             print('\n', file=sys.stderr)
             print('Repsonse:', file=sys.stderr)
@@ -212,8 +212,7 @@ def make_headers(verbose=None) -> dict:
         }
     if verbose == 3:
         # Redacting token as to not print it in the logs
-        censored_headers = dict(headers)
-        censored_headers['Authorization'] = "Bearer ***"
+        censored_headers = censor_headers(headers)
         print('Headers:\n' + json.dumps(censored_headers, indent=4) + '\n')
     return headers
 
