@@ -218,6 +218,13 @@ def make_headers(verbose=None) -> dict:
     return headers
 
 
+def censor_headers(headers: dict, field='Authorization') -> dict:
+    """ Returns a copy of headers with field being censored. """
+    censored_headers = dict(headers)
+    censored_headers[field] = '***'
+    return censored_headers
+
+
 def make_api_url(hostname: str, record_type='A',
                  dryrun=False, verbose=None) -> str:
     """ Return the API URL for the configured record. """
