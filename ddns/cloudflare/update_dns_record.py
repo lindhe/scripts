@@ -265,9 +265,12 @@ def get_record_id(hostname: str, record_type='A',
                            dryrun=dryrun,
                            verbose=verbose,
                            )
-        # TODO: we get a list of records. Would be nice to know that there's
-        # only one item in the list...
-        record_id = res.json()['result'][0]['id']
+        records = res.json()['result']
+        if len(records) > 1:
+            print("WARNING: more than one record found. Assuming index 0.",
+                  file=sys.stderr)
+            print(records, file=sys.stderr)
+        record_id = records[0]['id']
         if verbose == 2:
             print(f"Record ID for {hostname} is {record_id}")
     return record_id
