@@ -108,12 +108,23 @@ def send_request(
     if not dryrun:
         if verbose == 3:
             print("Sending {} request...".format(method.upper()))
-        if method == 'get':
-            res = requests.get(url, headers=headers, params=parameters,
-                               timeout=request_timeout)
-        if method == 'put':
-            res = requests.put(url, headers=headers, json=json_data,
-                               timeout=request_timeout)
+        try:
+            if method == 'get':
+                res = requests.get(url, headers=headers, params=parameters,
+                                   timeout=request_timeout)
+            if method == 'put':
+                res = requests.put(url, headers=headers, json=json_data,
+                                   timeout=request_timeout)
+        except requests.Timeout as error:
+            print("ERROR: Timeout was raised in send_request()",
+                  file=sys.stderr)
+            print(error, file=sys.stderr)
+            sys.exit(1)
+        except requests.ConnectionError as error:
+            print("A Connection exception was raised in send_request().",
+                  file=sys.stderr)
+            print(error, file=sys.stderr)
+            sys.exit(1)
         if res.ok:
             if verbose == 3:
                 print('Success!')
@@ -289,9 +300,15 @@ def current_public_ip(verbose=None) -> str:
         print("Looking up current IP address for this host...")
     try:
         res = requests.get('https://ipv4.icanhazip.com', timeout=10)
-    except requests.ConnectionError as e:
-        print("ERROR: ConnectionError was raised in current_public_ip()", file=sys.stderr)
-        print(e, file=sys.stderr)
+    except requests.Timeout as error:
+        print("ERROR: Timeout was raised in current_public_ip()",
+              file=sys.stderr)
+        print(error, file=sys.stderr)
+        sys.exit(1)
+    except requests.ConnectionError as error:
+        print("ERROR: ConnectionError was raised in current_public_ip()",
+              file=sys.stderr)
+        print(error, file=sys.stderr)
         sys.exit(1)
     ip_address: str = res.text.strip()
     if verbose == 2:
