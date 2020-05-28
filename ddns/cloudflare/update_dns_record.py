@@ -287,7 +287,13 @@ def current_public_ip(verbose=None) -> str:
     """ Get current public IP. """
     if verbose == 2:
         print("Looking up current IP address for this host...")
-    ip_address: str = requests.get('https://ipv4.icanhazip.com', timeout=10).text.strip()
+    try:
+        res = requests.get('https://ipv4.icanhazip.com', timeout=10)
+    except requests.ConnectionError as e:
+        print("ERROR: ConnectionError was raised in current_public_ip()", file=sys.stderr)
+        print(e, file=sys.stderr)
+        sys.exit(1)
+    ip_address: str = res.text.strip()
     if verbose == 2:
         print(ip_address)
     return ip_address
