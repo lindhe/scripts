@@ -16,7 +16,7 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 
 """
 
-__version__ = '1.1.2'
+__version__ = '1.2.0'
 __author__ = 'Andreas Lindhé'
 
 # Standard imports
@@ -97,6 +97,7 @@ def send_request(
     """ Sends an API request to Cloudflare. """
     assert method in ['get', 'put',
                       'post'], f"Incorrect method {method} for send_request()"
+    request_timeout = 10
     url: str = api_url or make_api_url(hostname, record_type=record_type,
                                        dryrun=dryrun, verbose=verbose)
     headers: dict = make_headers(verbose=verbose)
@@ -108,9 +109,11 @@ def send_request(
         if verbose == 3:
             print("Sending {} request...".format(method.upper()))
         if method == 'get':
-            res = requests.get(url, headers=headers, params=parameters)
+            res = requests.get(url, headers=headers, params=parameters,
+                               timeout=request_timeout)
         if method == 'put':
-            res = requests.put(url, headers=headers, json=json_data)
+            res = requests.put(url, headers=headers, json=json_data,
+                               timeout=request_timeout)
         if res.ok:
             if verbose == 3:
                 print('Success!')
@@ -284,7 +287,7 @@ def current_public_ip(verbose=None) -> str:
     """ Get current public IP. """
     if verbose == 2:
         print("Looking up current IP address for this host...")
-    ip_address: str = requests.get('https://ipv4.icanhazip.com').text.strip()
+    ip_address: str = requests.get('https://ipv4.icanhazip.com', timeout=10).text.strip()
     if verbose == 2:
         print(ip_address)
     return ip_address
