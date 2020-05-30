@@ -16,7 +16,7 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 
 """
 
-__version__ = '1.4.1'
+__version__ = '1.5.0'
 __author__ = 'Andreas Lindhé'
 
 # Standard imports
@@ -135,17 +135,22 @@ def send_request(
                 print(res.json())
         else:
             request = res.request
-            print('\n', file=sys.stderr)
-            print('# Request:\n'
-                  + 'Method: ' + str(request.method) + '\n'
-                  + 'URL: ' + str(request.url) + '\n'
-                  + 'Headers:\n' + str(censor_headers(dict(request.headers)))
-                  + '\n', file=sys.stderr)
-            print('\n', file=sys.stderr)
-            print('Repsonse:', file=sys.stderr)
-            print(res.text, file=sys.stderr)
+            debug_print_requests(str(request.method), str(request.url),
+                                 headers=dict(request.headers), response=res)
             sys.exit("ERROR: got an error when sending request.")
     return res
+
+
+def debug_print_requests(method: str, url: str, headers: dict, response=None):
+    """ Prints debug info for fields in a request. """
+    print('# Request:\n'
+          + 'Method: ' + method + '\n'
+          + 'URL: ' + url + '\n'
+          + 'Headers:\n' + json.dumps(censor_headers(headers), indent=4)
+          + '\n', file=sys.stderr)
+    print('\n', file=sys.stderr)
+    if response:
+        print('Repsonse:\n' + response.text, file=sys.stderr)
 
 
 def update_record(
