@@ -16,7 +16,7 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 
 """
 
-__version__ = '1.4.0'
+__version__ = '1.4.1'
 __author__ = 'Andreas Lindhé'
 
 # Standard imports
@@ -43,7 +43,7 @@ def main(
         verbose=None
         ):
     """ Update a DNS record to match the current IP address. """
-    if verbose == 2:
+    if verbose > 1:
         print(f"Version: {__version__}")
         print(f"dryrun = {dryrun}")
     required_environment_variables = [
@@ -60,7 +60,7 @@ def main(
                                                  verbose=verbose)
     # Only update record if the IPxs differ
     if my_ip != record_content:
-        if verbose == 1:
+        if verbose > 0:
             print('Current IP differs from DNS record.')
         update_record(
             content=my_ip,
@@ -71,7 +71,7 @@ def main(
             verbose=verbose
             )
     else:
-        if verbose == 1:
+        if verbose > 0:
             print('DNS record unchanged.')
 
 
@@ -109,7 +109,7 @@ def send_request(
     # We must supply a return value during dryrun.
     res = requests.Response()
     if not dryrun:
-        if verbose == 3:
+        if verbose > 2:
             print("Sending {} request...".format(method.upper()))
         try:
             if method == 'get':
@@ -129,7 +129,7 @@ def send_request(
             print(error, file=sys.stderr)
             sys.exit(1)
         if res.ok:
-            if verbose == 3:
+            if verbose > 2:
                 print('Success!')
                 print('# Repsonse:')
                 print(res.json())
@@ -166,7 +166,7 @@ def update_record(
         'ttl': ttl,
         'proxied': False,
         }
-    if verbose == 2:
+    if verbose > 1:
         print("Sending request to update record...")
     send_request(
         'put',
@@ -183,7 +183,7 @@ def update_record(
 def get_record_json(hostname: str, record_type='A', timeout=10,
                     dryrun=False, verbose=None) -> dict:
     """ Gets a DNS record. """
-    if verbose == 2:
+    if verbose > 1:
         print("Getting DNS record...")
     # Dummy record to return on dryrun
     record_json = {  # {{{
@@ -230,7 +230,7 @@ def make_headers(verbose=None) -> dict:
         "Authorization": f"Bearer {os.getenv('CF_DNS_API_TOKEN')}",
         "Content-Type": "application/json"
         }
-    if verbose == 3:
+    if verbose > 2:
         # Redacting token as to not print it in the logs
         censored_headers = censor_headers(headers)
         print('Headers:\n' + json.dumps(censored_headers, indent=4) + '\n')
@@ -256,7 +256,7 @@ def make_api_url(hostname: str, record_type='A',
                       dryrun=dryrun, verbose=verbose)
         )
     url = f"{API_ENDPOINT}/{str(api_path)}"
-    if verbose == 3:
+    if verbose > 2:
         print('URL: ' + url)
     return url
 
@@ -264,11 +264,11 @@ def make_api_url(hostname: str, record_type='A',
 def get_record_id(hostname: str, record_type='A', timeout=10,
                   dryrun=False, verbose=None) -> str:
     """ Return the Record ID for a hostname in the configured zone. """
-    if verbose == 3:
+    if verbose > 2:
         print(f"Getting Record ID for {hostname}")
     if dryrun:
         record_id = '372e67954025e0ba6aaa6d586b9e0b59'
-        if verbose == 2:
+        if verbose > 1:
             print(f"Picking dummy value for Record ID: {record_id}")
     if not dryrun:
         zone_id: str = get_zone_id(dryrun=dryrun, verbose=verbose)
@@ -289,7 +289,7 @@ def get_record_id(hostname: str, record_type='A', timeout=10,
                   file=sys.stderr)
             print(records, file=sys.stderr)
         record_id = records[0]['id']
-        if verbose == 2:
+        if verbose > 1:
             print(f"Record ID for {hostname} is {record_id}")
     return record_id
 
@@ -297,7 +297,7 @@ def get_record_id(hostname: str, record_type='A', timeout=10,
 def get_zone_id(dryrun=False, verbose=None) -> str:
     """ Return the Zone ID for the configured zone. """
     dummy_id = '023e105f4ecef8ad9ca31a8372d0c353'
-    if verbose == 3:
+    if verbose > 2:
         print("Getting Zone ID...")
         if dryrun:
             print(f"Picking dummy value for Zone ID: {dummy_id}")
@@ -306,7 +306,7 @@ def get_zone_id(dryrun=False, verbose=None) -> str:
 
 def current_public_ip(timeout=10, verbose=None) -> str:
     """ Get current public IP. """
-    if verbose == 2:
+    if verbose > 1:
         print("Looking up current IP address for this host...")
     try:
         res = requests.get('https://ipv4.icanhazip.com', timeout=timeout)
@@ -321,7 +321,7 @@ def current_public_ip(timeout=10, verbose=None) -> str:
         print(error, file=sys.stderr)
         sys.exit(1)
     ip_address: str = res.text.strip()
-    if verbose == 2:
+    if verbose > 1:
         print(ip_address)
     return ip_address
 
@@ -356,7 +356,7 @@ if __name__ == '__main__':
             'CNAME'],
         default='A')
     p.add_argument('-v', '--verbose', help="verbosity level [-v|-vv|-vvv]",
-                   action="count")
+                   action="count", default=0)
     p.add_argument('--version', action='version', version=__version__)
     # Run:
     args = p.parse_args()
