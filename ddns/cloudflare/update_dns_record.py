@@ -16,7 +16,7 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 
 """
 
-__version__ = '1.3.0'
+__version__ = '1.4.0'
 __author__ = 'Andreas Lindhé'
 
 # Standard imports
@@ -36,6 +36,7 @@ API_ENDPOINT = 'https://api.cloudflare.com/client/v4'
 def main(
         hostname='',
         ip_address='',
+        timeout=10,
         ttl=3600,
         record_type='A',
         dryrun=False,
@@ -51,10 +52,12 @@ def main(
         ]
     assert_env_vars(required_environment_variables)
     dns_record = get_record_json(hostname, record_type=record_type,
+                                 timeout=timeout,
                                  dryrun=dryrun, verbose=verbose)
     record_content: str = dns_record['result']['content']
     # Compare IP to avoid updating unnecessarily
-    my_ip: str = ip_address or current_public_ip(verbose=verbose)
+    my_ip: str = ip_address or current_public_ip(timeout=timeout,
+                                                 verbose=verbose)
     # Only update record if the IPxs differ
     if my_ip != record_content:
         if verbose == 1:
@@ -91,13 +94,13 @@ def send_request(
         json_data=None,
         record_type='A',
         parameters=None,
+        timeout=10,
         dryrun=False,
         verbose=None,
         ) -> requests.Response:
     """ Sends an API request to Cloudflare. """
     assert method in ['get', 'put',
                       'post'], f"Incorrect method {method} for send_request()"
-    request_timeout = 10
     url: str = api_url or make_api_url(hostname, record_type=record_type,
                                        dryrun=dryrun, verbose=verbose)
     headers: dict = make_headers(verbose=verbose)
@@ -111,10 +114,10 @@ def send_request(
         try:
             if method == 'get':
                 res = requests.get(url, headers=headers, params=parameters,
-                                   timeout=request_timeout)
+                                   timeout=timeout)
             if method == 'put':
                 res = requests.put(url, headers=headers, json=json_data,
-                                   timeout=request_timeout)
+                                   timeout=timeout)
         except requests.Timeout as error:
             print("ERROR: Timeout was raised in send_request()",
                   file=sys.stderr)
@@ -150,6 +153,7 @@ def update_record(
         dryrun=False,
         hostname='',
         record_type='A',
+        timeout=10,
         ttl=3600,
         verbose=None,
         ):
@@ -168,6 +172,7 @@ def update_record(
         'put',
         hostname,
         json_data=json_data,
+        timeout=timeout,
         dryrun=dryrun,
         verbose=verbose
         )
@@ -175,7 +180,7 @@ def update_record(
           f" to point to {content}")
 
 
-def get_record_json(hostname: str, record_type='A',
+def get_record_json(hostname: str, record_type='A', timeout=10,
                     dryrun=False, verbose=None) -> dict:
     """ Gets a DNS record. """
     if verbose == 2:
@@ -212,6 +217,7 @@ def get_record_json(hostname: str, record_type='A',
             'get',
             hostname,
             record_type=record_type,
+            timeout=timeout,
             dryrun=dryrun,
             verbose=verbose
         ).json()
@@ -255,7 +261,7 @@ def make_api_url(hostname: str, record_type='A',
     return url
 
 
-def get_record_id(hostname: str, record_type='A',
+def get_record_id(hostname: str, record_type='A', timeout=10,
                   dryrun=False, verbose=None) -> str:
     """ Return the Record ID for a hostname in the configured zone. """
     if verbose == 3:
@@ -273,6 +279,7 @@ def get_record_id(hostname: str, record_type='A',
                            api_url=url,
                            record_type=record_type,
                            parameters=query,
+                           timeout=timeout,
                            dryrun=dryrun,
                            verbose=verbose,
                            )
@@ -297,12 +304,12 @@ def get_zone_id(dryrun=False, verbose=None) -> str:
     return dummy_id if dryrun else str(os.getenv('CF_DNS_ZONE_ID'))
 
 
-def current_public_ip(verbose=None) -> str:
+def current_public_ip(timeout=10, verbose=None) -> str:
     """ Get current public IP. """
     if verbose == 2:
         print("Looking up current IP address for this host...")
     try:
-        res = requests.get('https://ipv4.icanhazip.com', timeout=10)
+        res = requests.get('https://ipv4.icanhazip.com', timeout=timeout)
     except requests.Timeout as error:
         print("ERROR: Timeout was raised in current_public_ip()",
               file=sys.stderr)
@@ -333,6 +340,10 @@ if __name__ == '__main__':
         '--ip-address',
         help="instead of looking up this host's IP, use this one")
     p.add_argument(
+        '--timeout',
+        help="Requests Read and Connect timeout in seconds (default: 10)",
+        default=10)
+    p.add_argument(
         '--ttl',
         help="ttl in seconds for the DNS record (default: 3600)",
         default=3600)
@@ -354,6 +365,7 @@ if __name__ == '__main__':
             dryrun=args.dryrun,
             hostname=args.hostname,
             ip_address=args.ip_address,
+            timeout=args.timeout,
             ttl=args.ttl,
             record_type=args.type,
             verbose=args.verbose
