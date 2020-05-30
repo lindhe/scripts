@@ -16,7 +16,7 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 
 """
 
-__version__ = '1.5.0'
+__version__ = '1.5.1'
 __author__ = 'Andreas Lindhé'
 
 # Standard imports
@@ -122,11 +122,13 @@ def send_request(
             print("ERROR: Timeout was raised in send_request()",
                   file=sys.stderr)
             print(error, file=sys.stderr)
+            debug_print_requests(method, url, headers=headers)
             sys.exit(1)
         except requests.ConnectionError as error:
             print("A Connection exception was raised in send_request().",
                   file=sys.stderr)
             print(error, file=sys.stderr)
+            debug_print_requests(method, url, headers=headers)
             sys.exit(1)
         if res.ok:
             if verbose > 2:
@@ -141,14 +143,14 @@ def send_request(
     return res
 
 
-def debug_print_requests(method: str, url: str, headers: dict, response=None):
+def debug_print_requests(method: str, url: str, headers=None, response=None):
     """ Prints debug info for fields in a request. """
     print('# Request:\n'
           + 'Method: ' + method + '\n'
-          + 'URL: ' + url + '\n'
-          + 'Headers:\n' + json.dumps(censor_headers(headers), indent=4)
-          + '\n', file=sys.stderr)
-    print('\n', file=sys.stderr)
+          + 'URL: ' + url + '\n', file=sys.stderr)
+    if headers:
+        print('Headers:\n' + json.dumps(censor_headers(headers), indent=4) +
+              '\n', file=sys.stderr)
     if response:
         print('Repsonse:\n' + response.text, file=sys.stderr)
 
@@ -311,19 +313,22 @@ def get_zone_id(dryrun=False, verbose=None) -> str:
 
 def current_public_ip(timeout=10, verbose=None) -> str:
     """ Get current public IP. """
+    url = 'https://ipv4.icanhazip.com'
     if verbose > 1:
-        print("Looking up current IP address for this host...")
+        print(f"Looking up current IP address using {url}...")
     try:
-        res = requests.get('https://ipv4.icanhazip.com', timeout=timeout)
+        res = requests.get(url, timeout=timeout)
     except requests.Timeout as error:
         print("ERROR: Timeout was raised in current_public_ip()",
               file=sys.stderr)
         print(error, file=sys.stderr)
+        debug_print_requests('get', url)
         sys.exit(1)
     except requests.ConnectionError as error:
         print("ERROR: ConnectionError was raised in current_public_ip()",
               file=sys.stderr)
         print(error, file=sys.stderr)
+        debug_print_requests('get', url)
         sys.exit(1)
     ip_address: str = res.text.strip()
     if verbose > 1:
