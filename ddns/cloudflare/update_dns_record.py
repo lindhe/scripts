@@ -351,10 +351,12 @@ if __name__ == '__main__':
         help="instead of looking up this host's IP, use this one")
     p.add_argument(
         '--timeout',
+        type=int,
         help="Requests Read and Connect timeout in seconds (default: 10)",
         default=10)
     p.add_argument(
         '--ttl',
+        type=int,
         help="ttl in seconds for the DNS record (default: 3600)",
         default=3600)
     p.add_argument(
