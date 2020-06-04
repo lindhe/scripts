@@ -45,11 +45,12 @@ CF_DNS_API_TOKEN='YQSn-xWAQiiEh9qM58wZNnyQS7FUdoqGIUAbrh7T' CF_DNS_ZONE_ID='023e
 
 ## Snap
 
-In a vain try to make this easier to install on more systems, I've made an effort to package it using snap.
-The workflow might look something like this:
+The workflow to create a snap is something like this:
 
-1. `make package`
-1. `sudo snap install lindhe-cloudflare-ddns_1.1.0_amd64.snap`
+1. clone this repo
+2. `cd scripts/ddns/cloudflare`
+3. `snapcraft`
+3. `sudo snap install lindhe-cloudflare-ddns_1.1.0_amd64.snap --devmode`
 1. `lindhe-cloudflare-ddns --help`
 1. `sudo snap remove lindhe-cloudflare-ddns`
 

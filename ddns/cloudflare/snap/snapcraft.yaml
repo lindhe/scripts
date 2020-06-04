@@ -5,15 +5,23 @@ summary: A DDNS client for Cloudflare DNS
 description: |
   I made this script to be run as a cronjob that updates my DNS whenever the
   static IP changes.
-grade: stable
-confinement: strict
+# grade: stable
+grade: devel
+# confinement: strict
+confinement: devmode
 
 parts:
   lindhe-cloudflare-ddns:
+    build-packages:
+      - distro-info
+      - cloud-init
+    stage-packages:
+      #- cloud-init
+      - libatm1
     plugin: python
     python-version: python3
-    requirements:
-      - ./requirements.txt
+    #requirements:
+    #  - ./requirements.txt
     source: .
 
 apps:
