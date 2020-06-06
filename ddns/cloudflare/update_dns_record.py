@@ -16,7 +16,7 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 
 """
 
-__version__ = '1.5.2'
+__version__ = '1.6.0'
 __author__ = 'Andreas Lindhé'
 
 # Standard imports
@@ -138,21 +138,35 @@ def send_request(
         else:
             request = res.request
             debug_print_requests(str(request.method), str(request.url),
-                                 headers=dict(request.headers), response=res)
+                                 headers=dict(request.headers))
+            debug_print_response(res)
             sys.exit("ERROR: got an error when sending request.")
     return res
 
 
-def debug_print_requests(method: str, url: str, headers=None, response=None):
-    """ Prints debug info for fields in a request. """
-    print('# Request:\n'
+def debug_print_requests(method: str, url: str, headers=None):
+    """ Prints debug info for a request. """
+    print('\n# Request:\n'
           + 'Method: ' + method + '\n'
           + 'URL: ' + url + '\n', file=sys.stderr)
     if headers:
-        print('Headers:\n' + json.dumps(censor_headers(headers), indent=4) +
-              '\n', file=sys.stderr)
-    if response:
-        print('Repsonse:\n' + response.text, file=sys.stderr)
+        print('Request headers:\n'
+              + json.dumps(censor_headers(headers), indent=4) + '\n',
+              file=sys.stderr)
+
+
+def debug_print_response(response: requests.Response):
+    """ Prints debug info for a response. """
+    print('\n# Response:', file=sys.stderr)
+    print(f"response.ok: {response.ok}", file=sys.stderr)
+    print('Response headers:\n'
+          + json.dumps(dict(response.headers), indent=4) + '\n',
+          file=sys.stderr)
+    if 'application/json' in response.headers['Content-Type']:
+        print('Response content:\n' + json.dumps(response.json(), indent=4),
+              file=sys.stderr)
+    else:
+        print('Repsonse content:\n' + response.text, file=sys.stderr)
 
 
 def update_record(
