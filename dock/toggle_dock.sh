@@ -5,7 +5,7 @@ RES=''
 ~/scripts/dock/check_for_dock.sh
 
 if [ $? -eq 0 ]; then
-    ~/scripts/dock/monman.py -a \
+    ~/scripts/dock/monman.py -a ${IAMAT:+~/.config/monitors/${IAMAT}.json} \
         && RES='Docking successful!' || RES='Docking failed!';
 else
     ~/scripts/dock/monman.py -d \
