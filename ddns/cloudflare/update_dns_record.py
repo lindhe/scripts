@@ -312,6 +312,8 @@ def censor_headers(headers: dict, field='Authorization') -> dict:
 def make_api_url(hostname: str, record_type='A',
                  dryrun=False, verbose=None, info=None) -> str:
     """ Return the API URL for the configured record. """
+    if verbose > 1:
+        debug_print_info(info)
     new_info = {
         "message": "get_record_id() initiated by make_api_url()",
         "count": info["count"] + 1
