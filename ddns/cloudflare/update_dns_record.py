@@ -116,11 +116,16 @@ def send_request(
     """ Sends an API request to Cloudflare. """
     assert method in ['get', 'put',
                       'post'], f"Incorrect method {method} for send_request()"
-    url: str = api_url or make_api_url(hostname, record_type=record_type,
-                                       dryrun=dryrun, verbose=verbose)
-    headers: dict = make_headers(verbose=verbose)
-    if verbose > 1 and 'message' in info:
+    if verbose > 1:
         debug_print_info(info)
+    new_info = {
+        "message": "make_api_url() initiated by send_request()",
+        "count": info["count"] + 1
+    }
+    url: str = api_url or make_api_url(hostname, record_type=record_type,
+                                       dryrun=dryrun, verbose=verbose,
+                                       info=new_info)
+    headers: dict = make_headers(verbose=verbose)
     if verbose and json_data:
         print('Data:\n' + json.dumps(json_data, indent=4) + '\n')
     # We must supply a return value during dryrun.
@@ -305,15 +310,19 @@ def censor_headers(headers: dict, field='Authorization') -> dict:
 
 
 def make_api_url(hostname: str, record_type='A',
-                 dryrun=False, verbose=None) -> str:
+                 dryrun=False, verbose=None, info=None) -> str:
     """ Return the API URL for the configured record. """
+    new_info = {
+        "message": "get_record_id() initiated by make_api_url()",
+        "count": info["count"] + 1
+    }
     # API endpoint
     api_path = pathlib.PurePath(
         'zones',
         get_zone_id(dryrun=dryrun, verbose=verbose),
         'dns_records',
         get_record_id(hostname, record_type=record_type,
-                      dryrun=dryrun, verbose=verbose)
+                      dryrun=dryrun, verbose=verbose, info=new_info)
         )
     url = f"{API_ENDPOINT}/{str(api_path)}"
     if verbose > 2:
