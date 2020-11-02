@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # License: MIT
@@ -16,7 +16,7 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 
 """
 
-__version__ = '1.6.0'
+__version__ = '1.7.0'
 __author__ = 'Andreas Lindhé'
 
 # Standard imports
