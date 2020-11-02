@@ -16,7 +16,7 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 
 """
 
-__version__ = '1.7.0'
+__version__ = '1.8.0'
 __author__ = 'Andreas Lindhé'
 
 # Standard imports
@@ -51,24 +51,38 @@ def main(
         'CF_DNS_ZONE_ID',
         ]
     assert_env_vars(required_environment_variables)
+    grj_info = {
+        "count": 0,  # this is the first info message from main
+        "message": "get_record_json() initiated by main()"
+    }
     dns_record = get_record_json(hostname, record_type=record_type,
                                  timeout=timeout,
-                                 dryrun=dryrun, verbose=verbose)
+                                 dryrun=dryrun, verbose=verbose, info=grj_info)
     record_content: str = dns_record['result']['content']
+    cpi_info = {
+        "count": 1,  # this is the second info message from main
+        "message": "current_public_ip() initiated by main()"
+    }
     # Compare IP to avoid updating unnecessarily
     my_ip: str = ip_address or current_public_ip(timeout=timeout,
-                                                 verbose=verbose)
+                                                 verbose=verbose,
+                                                 info=cpi_info)
     # Only update record if the IPxs differ
     if my_ip != record_content:
         if verbose > 0:
             print('Current IP differs from DNS record.')
+        new_info = {
+            "count": 2,  # this is the third info message from main
+            "message": "update_record() initiated by main()"
+        }
         update_record(
             content=my_ip,
             dryrun=dryrun,
             hostname=hostname,
             record_type=record_type,
             ttl=ttl,
-            verbose=verbose
+            verbose=verbose,
+            info=new_info
             )
     else:
         if verbose > 0:
@@ -97,6 +111,7 @@ def send_request(
         timeout=10,
         dryrun=False,
         verbose=None,
+        info=None
         ) -> requests.Response:
     """ Sends an API request to Cloudflare. """
     assert method in ['get', 'put',
@@ -104,6 +119,8 @@ def send_request(
     url: str = api_url or make_api_url(hostname, record_type=record_type,
                                        dryrun=dryrun, verbose=verbose)
     headers: dict = make_headers(verbose=verbose)
+    if verbose > 1 and 'message' in info:
+        debug_print_info(info)
     if verbose and json_data:
         print('Data:\n' + json.dumps(json_data, indent=4) + '\n')
     # We must supply a return value during dryrun.
@@ -169,6 +186,15 @@ def debug_print_response(response: requests.Response):
         print('Repsonse content:\n' + response.text, file=sys.stderr)
 
 
+def debug_print_info(info: dict):
+    """ Prints an info object. """
+    print("Info count:\t{}".format(info['count']))
+    if 'message' in info:
+        print("Info message:\t\"" + info['message'] + "\"")
+    else:
+        print("WARNING! Got info object without message!", file=sys.stderr)
+
+
 def update_record(
         content='',
         dryrun=False,
@@ -177,6 +203,7 @@ def update_record(
         timeout=10,
         ttl=3600,
         verbose=None,
+        info=None
         ):
     """ Update a DNS record to hold a new value. """
     # Data
@@ -189,23 +216,30 @@ def update_record(
         }
     if verbose > 1:
         print("Sending request to update record...")
+        debug_print_info(info)
+    new_info = {
+        "message": "send_request() initiated by update_record()",
+        "count": info["count"] + 1
+    }
     send_request(
         'put',
         hostname,
         json_data=json_data,
         timeout=timeout,
         dryrun=dryrun,
-        verbose=verbose
+        verbose=verbose,
+        info=new_info
         )
     print(f"Successfully updated DNS record of {hostname}" +
           f" to point to {content}")
 
 
 def get_record_json(hostname: str, record_type='A', timeout=10,
-                    dryrun=False, verbose=None) -> dict:
+                    dryrun=False, verbose=None, info=None) -> dict:
     """ Gets a DNS record. """
     if verbose > 1:
         print("Getting DNS record...")
+        debug_print_info(info)
     # Dummy record to return on dryrun
     record_json = {  # {{{
         'result': {
@@ -234,13 +268,18 @@ def get_record_json(hostname: str, record_type='A', timeout=10,
     }
 # }}}
     if not dryrun:
+        new_info = {
+            "message": "send_request() initiated by get_record_json()",
+            "count": info["count"] + 1
+        }
         record_json = send_request(
             'get',
             hostname,
             record_type=record_type,
             timeout=timeout,
             dryrun=dryrun,
-            verbose=verbose
+            verbose=verbose,
+            info=new_info
         ).json()
     return record_json
 
@@ -283,10 +322,12 @@ def make_api_url(hostname: str, record_type='A',
 
 
 def get_record_id(hostname: str, record_type='A', timeout=10,
-                  dryrun=False, verbose=None) -> str:
+                  dryrun=False, verbose=None, info=None) -> str:
     """ Return the Record ID for a hostname in the configured zone. """
-    if verbose > 2:
-        print(f"Getting Record ID for {hostname}")
+    if verbose > 1:
+        debug_print_info(info)
+        if verbose > 2:
+            print(f"Getting Record ID for {hostname}")
     if dryrun:
         record_id = '372e67954025e0ba6aaa6d586b9e0b59'
         if verbose > 1:
@@ -295,6 +336,10 @@ def get_record_id(hostname: str, record_type='A', timeout=10,
         zone_id: str = get_zone_id(dryrun=dryrun, verbose=verbose)
         url = f"{API_ENDPOINT}/zones/{zone_id}/dns_records"
         query = {'type': record_type, 'name': hostname}
+        new_info = {
+            "message": "send_request() initiated by get_record_id()",
+            "count": info["count"] + 1
+        }
         res = send_request('get',
                            hostname,
                            api_url=url,
@@ -303,6 +348,7 @@ def get_record_id(hostname: str, record_type='A', timeout=10,
                            timeout=timeout,
                            dryrun=dryrun,
                            verbose=verbose,
+                           info=new_info
                            )
         records = res.json()['result']
         if len(records) > 1:
@@ -325,10 +371,11 @@ def get_zone_id(dryrun=False, verbose=None) -> str:
     return dummy_id if dryrun else str(os.getenv('CF_DNS_ZONE_ID'))
 
 
-def current_public_ip(timeout=10, verbose=None) -> str:
+def current_public_ip(timeout=10, verbose=None, info=None) -> str:
     """ Get current public IP. """
     url = 'https://ipv4.icanhazip.com'
     if verbose > 1:
+        debug_print_info(info)
         print(f"Looking up current IP address using {url}...")
     try:
         res = requests.get(url, timeout=timeout)
