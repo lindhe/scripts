@@ -16,7 +16,7 @@ https://api.cloudflare.com/#dns-records-for-a-zone-update-dns-record
 
 """
 
-__version__ = '1.8.0'
+__version__ = '1.8.1'
 __author__ = 'Andreas Lindhé'
 
 # Standard imports
@@ -124,7 +124,7 @@ def send_request(
     }
     url: str = api_url or make_api_url(hostname, record_type=record_type,
                                        dryrun=dryrun, verbose=verbose,
-                                       info=new_info)
+                                       timeout=timeout, info=new_info)
     headers: dict = make_headers(verbose=verbose)
     if verbose and json_data:
         print('Data:\n' + json.dumps(json_data, indent=4) + '\n')
@@ -309,7 +309,7 @@ def censor_headers(headers: dict, field='Authorization') -> dict:
     return censored_headers
 
 
-def make_api_url(hostname: str, record_type='A',
+def make_api_url(hostname: str, record_type='A', timeout=10,
                  dryrun=False, verbose=None, info=None) -> str:
     """ Return the API URL for the configured record. """
     if verbose > 1:
@@ -323,7 +323,7 @@ def make_api_url(hostname: str, record_type='A',
         'zones',
         get_zone_id(dryrun=dryrun, verbose=verbose),
         'dns_records',
-        get_record_id(hostname, record_type=record_type,
+        get_record_id(hostname, record_type=record_type, timeout=timeout,
                       dryrun=dryrun, verbose=verbose, info=new_info)
         )
     url = f"{API_ENDPOINT}/{str(api_path)}"
@@ -339,6 +339,7 @@ def get_record_id(hostname: str, record_type='A', timeout=10,
         debug_print_info(info)
         if verbose > 2:
             print(f"Getting Record ID for {hostname}")
+            print(f"Timeout is {timeout}")
     if dryrun:
         record_id = '372e67954025e0ba6aaa6d586b9e0b59'
         if verbose > 1:
