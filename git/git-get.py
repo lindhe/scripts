@@ -27,6 +27,32 @@ def main(git_location: str, git_repo: str, dry_run: bool):
     print(f"{git_location=}")
     print(f"{git_repo=}")
     print(f"{dry_run=}")
+    target_path = get_path_from_uri(git_repo)
+    exit_if_target_exists(target_path)
+    create_path(target_path, dry_run=dry_run)
+    git_clone(repo_uri=git_repo, target_path=target_path, dry_run=dry_run)
+
+
+def exit_if_target_exists(target_path: str):
+    """ Exit with error code if target_path already exists """
+    pass
+
+
+def get_path_from_uri(repo_uri: str):
+    """ Given a URI to a git repo, return the target path. """
+    return "/tmp/todo"
+
+
+def create_path(path: str, dry_run=False):
+    """ Safely create path. Is idempotent. """
+    # TODO: mkdir -p $path
+    pass
+
+
+def git_clone(repo_uri: str, target_path: str, dry_run=False):
+    """ git clone a repo to a specific target location. """
+    # TODO: git clone "${repo_uri}" "${target_path}"
+    pass
 
 
 if __name__ == '__main__':
