@@ -10,6 +10,13 @@ This script makes it easier to clone a git repo from e.g. Github and put it in
 a directory according to the repo owner in the URI.
 """
 
+# TODO: Unit tests
+# Test strings:
+# - https://github.com/lindhe/dotfiles
+# - http://gitlab.example.com/lindhe/dotfiles
+# - https://github.com/lindhe/dotfiles.git
+# - git@github.com:lindhe/dotfiles.git
+
 
 import argparse
 import os
