@@ -21,6 +21,7 @@ a directory according to the repo owner in the URI.
 import argparse
 import os
 import sys
+from pathlib import Path
 
 
 __author__ = "Andreas Lindhé"
@@ -40,7 +41,7 @@ def main(git_location: str, git_repo: str, dry_run: bool):
     git_clone(repo_uri=git_repo, target_path=target_path, dry_run=dry_run)
 
 
-def exit_if_target_exists(target_path: str):
+def exit_if_target_exists(target_path: Path):
     """ Exit with error code if target_path already exists """
     pass
 
@@ -56,7 +57,7 @@ def create_path(path: str, dry_run=False):
     pass
 
 
-def git_clone(repo_uri: str, target_path: str, dry_run=False):
+def git_clone(repo_uri: str, target_path: Path, dry_run=False):
     """ git clone a repo to a specific target location. """
     # TODO: git clone "${repo_uri}" "${target_path}"
     pass
