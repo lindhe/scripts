@@ -65,6 +65,10 @@ def exit_if_target_exists(target_path: Path, verbose=0):
 
 def get_path_from_uri(repo_uri: str, base_path: str) -> Path:
     """ Given a URI to a git repo, return the target path. """
+    if repo_uri[:4] != "http":
+        print("Non-HTTP protocols are not supported in git-get yet.",
+              file=sys.stderr)
+        sys.exit(1)
     owner, name = repo_uri.rstrip(".git").split("/")[-2:]
     return Path(base_path, owner, name)
 
