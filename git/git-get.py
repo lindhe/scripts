@@ -7,7 +7,7 @@
 """ git get
 
 This script makes it easier to clone a git repo from e.g. Github and put it in
-a directory according to the repo owner in the URL.
+a directory according to the repo owner in the URI.
 """
 
 
