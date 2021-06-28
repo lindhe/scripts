@@ -32,10 +32,14 @@ description = "Takes a URI to a Git repo and clones it into a specified path."
 
 def main(git_location: str, git_repo: str, dry_run: bool, verbose: int):
     """ Clone the git repo """
-    print(f"{git_location=}")
-    print(f"{git_repo=}")
-    print(f"{dry_run=}")
+    if verbose > 1:
+        print(f"{git_location=}")
+        print(f"{git_repo=}")
+        print(f"{dry_run=}")
+        print(f"{verbose=}")
     target_path = get_path_from_uri(git_repo, base_path=git_location)
+    if verbose:
+        print(f"{target_path=}")
     exit_if_target_exists(target_path)
     create_path(target_path, dry_run=dry_run)
     git_clone(repo_uri=git_repo, target_path=target_path, dry_run=dry_run)
