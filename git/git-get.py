@@ -17,6 +17,8 @@ a directory according to the repo owner in the URI.
 # - https://github.com/lindhe/dotfiles.git
 # - git@github.com:lindhe/dotfiles.git
 
+# TODO: Support for SSH
+
 
 import argparse
 import os
