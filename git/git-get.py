@@ -30,7 +30,7 @@ __version__ = "0.1.0"
 description = "Takes a URI to a Git repo and clones it into a specified path."
 
 
-def main(git_location: str, git_repo: str, dry_run: bool):
+def main(git_location: str, git_repo: str, dry_run: bool, verbose: int):
     """ Clone the git repo """
     print(f"{git_location=}")
     print(f"{git_repo=}")
@@ -79,6 +79,8 @@ if __name__ == '__main__':
                    help="Overrides GLOBAL_GIT_LOCATION envvar as custom path"
                    " for storing git repos."
                    f" (default: {git_location})")
+    p.add_argument('-v', '--verbose', action='count', default=0,
+                   help="Verbosity level.")
     p.add_argument('-V', '--version', action='version', version=__version__)
     # Run:
     args = p.parse_args()
@@ -86,7 +88,8 @@ if __name__ == '__main__':
         main(
             git_location=args.git_location,
             git_repo=args.git_repo,
-            dry_run=args.dry_run
+            dry_run=args.dry_run,
+            verbose=args.verbose
         )
     except KeyboardInterrupt:
         sys.exit("\nInterrupted by ^C\n")
