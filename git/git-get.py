@@ -41,7 +41,7 @@ def main(git_location: str, git_repo: str, dry_run: bool, verbose: int):
     if verbose:
         print(f"{target_path=}")
     exit_if_target_exists(target_path, verbose)
-    create_path(target_path, dry_run=dry_run)
+    os.makedirs(target_path, exist_ok=True)
     git_clone(repo_uri=git_repo, target_path=target_path, dry_run=dry_run)
 
 
@@ -66,12 +66,6 @@ def get_path_from_uri(repo_uri: str, base_path: str) -> Path:
     """ Given a URI to a git repo, return the target path. """
     owner, name = repo_uri.rstrip(".git").split("/")[-2:]
     return Path(base_path, owner, name)
-
-
-def create_path(path: str, dry_run=False):
-    """ Safely create path. Is idempotent. """
-    # TODO: mkdir -p $path
-    pass
 
 
 def git_clone(repo_uri: str, target_path: Path, dry_run=False):
