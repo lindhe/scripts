@@ -35,7 +35,7 @@ def main(git_location: str, git_repo: str, dry_run: bool):
     print(f"{git_location=}")
     print(f"{git_repo=}")
     print(f"{dry_run=}")
-    target_path = get_path_from_uri(git_repo)
+    target_path = get_path_from_uri(git_repo, base_path=git_location)
     exit_if_target_exists(target_path)
     create_path(target_path, dry_run=dry_run)
     git_clone(repo_uri=git_repo, target_path=target_path, dry_run=dry_run)
@@ -46,9 +46,10 @@ def exit_if_target_exists(target_path: Path):
     pass
 
 
-def get_path_from_uri(repo_uri: str):
+def get_path_from_uri(repo_uri: str, base_path: str) -> Path:
     """ Given a URI to a git repo, return the target path. """
-    return "/tmp/todo"
+    owner, name = repo_uri.rstrip(".git").split("/")[-2:]
+    return Path(base_path, owner, name)
 
 
 def create_path(path: str, dry_run=False):
