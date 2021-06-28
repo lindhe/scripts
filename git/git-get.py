@@ -11,8 +11,8 @@ a directory according to the repo owner in the URL.
 """
 
 
-import sys
 import argparse
+import sys
 
 
 __author__ = "Andreas Lindhé"
