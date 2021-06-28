@@ -26,8 +26,8 @@ from pathlib import Path
 
 __author__ = "Andreas Lindhé"
 __license__ = "MIT"
-__version__ = "0.1.0"
-description = "Takes a URI to a Git repo and clones it into a specified path."
+__version__ = "1.0.0"
+description = "Clones a Git repo into a specified path."
 
 
 def main(git_location: str, git_repo: str, dry_run: bool, verbose: int):
