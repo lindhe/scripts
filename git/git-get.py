@@ -40,14 +40,26 @@ def main(git_location: str, git_repo: str, dry_run: bool, verbose: int):
     target_path = get_path_from_uri(git_repo, base_path=git_location)
     if verbose:
         print(f"{target_path=}")
-    exit_if_target_exists(target_path)
+    exit_if_target_exists(target_path, verbose)
     create_path(target_path, dry_run=dry_run)
     git_clone(repo_uri=git_repo, target_path=target_path, dry_run=dry_run)
 
 
-def exit_if_target_exists(target_path: Path):
+def exit_if_target_exists(target_path: Path, verbose=0):
     """ Exit with error code if target_path already exists """
-    pass
+    if not os.path.exists(target_path):
+        if verbose > 1:
+            print("There exists no file or directory at "
+                  f"{target_path}, so it's safe to continue.")
+        return
+    if not os.path.isdir(target_path):
+        print(f"{target_path} exists, but it's not a directory!",
+              file=sys.stderr)
+        sys.exit(1)
+    if any(os.scandir(target_path)):
+        print(f"{target_path} exists, but it's not empty!",
+              file=sys.stderr)
+        sys.exit(1)
 
 
 def get_path_from_uri(repo_uri: str, base_path: str) -> Path:
