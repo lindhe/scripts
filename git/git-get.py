@@ -43,7 +43,7 @@ def main(git_location: str, git_repo: str, dry_run: bool, verbose: int):
     exit_if_target_exists(target_path, verbose)
     if not dry_run:
         os.makedirs(target_path, exist_ok=True)
-        git_clone(repo_uri=git_repo, target_path=target_path)
+        os.system(f"git clone {git_repo} {target_path}")
 
 
 def exit_if_target_exists(target_path: Path, verbose=0):
@@ -67,12 +67,6 @@ def get_path_from_uri(repo_uri: str, base_path: str) -> Path:
     """ Given a URI to a git repo, return the target path. """
     owner, name = repo_uri.rstrip(".git").split("/")[-2:]
     return Path(base_path, owner, name)
-
-
-def git_clone(repo_uri: str, target_path: Path):
-    """ git clone a repo to a specific target location. """
-    # TODO: git clone "${repo_uri}" "${target_path}"
-    pass
 
 
 if __name__ == '__main__':
