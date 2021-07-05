@@ -29,7 +29,7 @@ from pathlib import Path
 
 __author__ = "Andreas Lindhé"
 __license__ = "MIT"
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 description = "Clones a Git repo into a specified path."
 
 
@@ -71,8 +71,14 @@ def get_path_from_uri(repo_uri: str, base_path: str) -> Path:
     if re.match('^https://', repo_uri):
         # https://github.com/lindhe/scripts.git
         owner, name = repo_uri.rstrip(".git").split("/")[-2:]
+    elif re.match('^git@', repo_uri):
+        # git@github.com:lindhe/scripts.git
+        owner, name = repo_uri.rstrip(".git").split(':')[-1].split("/")[-2:]
     else:
-        print("Non-HTTPS protocols are not supported in git-get yet.",
+        print("Only the following protocols are supported in git-get:\n"
+              "\tHTTPS (e.g. https://github.com/lindhe/scripts.git)\n"
+              "\tSSH (e.g. git@github.com:lindhe/scripts.git)\n"
+              "",
               file=sys.stderr)
         sys.exit(1)
     return Path(base_path, owner, name)
