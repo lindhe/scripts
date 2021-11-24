@@ -38,7 +38,8 @@ def main(git_location: str, git_repo: str, dry_run: bool, verbose: int):
         print(f"{git_repo=}")
         print(f"{dry_run=}")
         print(f"{verbose=}")
-    target_path = get_path_from_uri(git_repo, base_path=git_location)
+    target_path = get_path_from_uri(git_repo, base_path=git_location,
+                                    verbose=verbose)
     if verbose:
         print(f"{target_path=}")
     exit_if_target_exists(target_path, verbose)
@@ -64,14 +65,20 @@ def exit_if_target_exists(target_path: Path, verbose=0):
         sys.exit(1)
 
 
-def get_path_from_uri(repo_uri: str, base_path: str) -> Path:
+def get_path_from_uri(repo_uri: str, base_path: str, verbose=0) -> Path:
     """ Given a URI to a git repo, return the target path. """
+    if verbose > 1:
+        print(f"get_path_from_uri({repo_uri=}, {base_path=})")
     if re.match('^https://', repo_uri):
         # https://github.com/lindhe/scripts.git
         owner, name = repo_uri.rstrip(".git").split("/")[-2:]
+        if verbose > 1:
+            print(f"Matched HTTPS URI: {owner=}, {name=}")
     elif re.match('^git@', repo_uri):
         # git@github.com:lindhe/scripts.git
         owner, name = repo_uri.rstrip(".git").split(':')[-1].split("/")[-2:]
+        if verbose > 1:
+            print(f"Matched Git URI: {owner=}, {name=}")
     else:
         print("Only the following protocols are supported in git-get:\n"
               "\tHTTPS (e.g. https://github.com/lindhe/scripts.git)\n"
