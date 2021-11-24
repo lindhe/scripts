@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.9
 # -*- coding: utf-8 -*-
 #
 # License: MIT
@@ -27,7 +27,7 @@ from pathlib import Path
 
 __author__ = "Andreas Lindhé"
 __license__ = "MIT"
-__version__ = "1.1.0"
+__version__ = "2.0.0"
 description = "Clones a Git repo into a specified path."
 
 
@@ -71,12 +71,13 @@ def get_path_from_uri(repo_uri: str, base_path: str, verbose=0) -> Path:
         print(f"get_path_from_uri({repo_uri=}, {base_path=})")
     if re.match('^https://', repo_uri):
         # https://github.com/lindhe/scripts.git
-        owner, name = repo_uri.rstrip(".git").split("/")[-2:]
+        owner, name = repo_uri.removesuffix(".git").split("/")[-2:]
         if verbose > 1:
             print(f"Matched HTTPS URI: {owner=}, {name=}")
     elif re.match('^git@', repo_uri):
         # git@github.com:lindhe/scripts.git
-        owner, name = repo_uri.rstrip(".git").split(':')[-1].split("/")[-2:]
+        uri_path = repo_uri.removesuffix(".git").split(':')[-1]
+        owner, name = uri_path.split("/")[-2:]
         if verbose > 1:
             print(f"Matched Git URI: {owner=}, {name=}")
     else:
