@@ -27,7 +27,7 @@ from pathlib import Path
 
 __author__ = "Andreas Lindhé"
 __license__ = "MIT"
-__version__ = "2.0.1"
+__version__ = "2.1.0"
 description = "Clones a Git repo into a specified path."
 
 
@@ -39,10 +39,12 @@ def main(
 ):
     """ Clone the git repo """
     if verbose > 1:
-        print(f"{git_location=}")
-        print(f"{git_repo=}")
-        print(f"{dry_run=}")
-        print(f"{verbose=}")
+        print("\nmain( "
+              f"{dry_run=}, "
+              f"{git_location=}, "
+              f"{git_repo=}, "
+              f"{verbose=} "
+              ")")
     target_path = get_path_from_uri(
         git_repo,
         base_path=git_location,
@@ -58,6 +60,11 @@ def main(
 
 def exit_if_target_exists(target_path: Path, verbose=0):
     """ Exit with error code if target_path already exists """
+    if verbose > 1:
+        print("\nexit_if_target_exists( "
+              f"{target_path=}, "
+              f"{verbose=} "
+              ")")
     if not os.path.exists(target_path):
         if verbose > 1:
             print("There exists no file or directory at "
@@ -80,9 +87,9 @@ def get_path_from_uri(
 ) -> Path:
     """ Given a URI to a git repo, return the target path. """
     if verbose > 1:
-        print(f"get_path_from_uri("
-              f"{base_path=}"
-              f"{repo_uri=}, "
+        print(f"\nget_path_from_uri( "
+              f"{base_path=}, "
+              f"{repo_uri=} "
               ")"
               )
     if re.match('^https://', repo_uri):
@@ -126,6 +133,9 @@ if __name__ == '__main__':
     p.add_argument('-V', '--version', action='version', version=__version__)
     # Run:
     args = p.parse_args()
+    if args.verbose > 1:
+        print("\n__main__:")
+        print(f"{args=}")
     try:
         main(
             dry_run=args.dry_run,
