@@ -27,7 +27,7 @@ from pathlib import Path
 
 __author__ = "Andreas Lindhé"
 __license__ = "MIT"
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 description = "Clones a Git repo into a specified path."
 
 
@@ -46,8 +46,8 @@ def main(
               f"{verbose=} "
               ")")
     target_path = get_path_from_uri(
-        git_repo,
         base_path=git_location,
+        repo_uri=git_repo,
         verbose=verbose
     )
     if verbose:
