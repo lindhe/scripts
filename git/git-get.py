@@ -27,19 +27,27 @@ from pathlib import Path
 
 __author__ = "Andreas Lindhé"
 __license__ = "MIT"
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 description = "Clones a Git repo into a specified path."
 
 
-def main(git_location: str, git_repo: str, dry_run: bool, verbose: int):
+def main(
+    dry_run: bool,
+    git_location: str,
+    git_repo: str,
+    verbose: int
+):
     """ Clone the git repo """
     if verbose > 1:
         print(f"{git_location=}")
         print(f"{git_repo=}")
         print(f"{dry_run=}")
         print(f"{verbose=}")
-    target_path = get_path_from_uri(git_repo, base_path=git_location,
-                                    verbose=verbose)
+    target_path = get_path_from_uri(
+        git_repo,
+        base_path=git_location,
+        verbose=verbose
+    )
     if verbose:
         print(f"{target_path=}")
     exit_if_target_exists(target_path, verbose)
@@ -65,10 +73,18 @@ def exit_if_target_exists(target_path: Path, verbose=0):
         sys.exit(1)
 
 
-def get_path_from_uri(repo_uri: str, base_path: str, verbose=0) -> Path:
+def get_path_from_uri(
+    base_path: str,
+    repo_uri: str,
+    verbose=0
+) -> Path:
     """ Given a URI to a git repo, return the target path. """
     if verbose > 1:
-        print(f"get_path_from_uri({repo_uri=}, {base_path=})")
+        print(f"get_path_from_uri("
+              f"{base_path=}"
+              f"{repo_uri=}, "
+              ")"
+              )
     if re.match('^https://', repo_uri):
         # https://github.com/lindhe/scripts.git
         owner, name = repo_uri.removesuffix(".git").split("/")[-2:]
@@ -112,9 +128,9 @@ if __name__ == '__main__':
     args = p.parse_args()
     try:
         main(
+            dry_run=args.dry_run,
             git_location=args.git_location,
             git_repo=args.git_repo,
-            dry_run=args.dry_run,
             verbose=args.verbose
         )
     except KeyboardInterrupt:
