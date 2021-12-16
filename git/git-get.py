@@ -23,11 +23,12 @@ import os
 import re
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 
 __author__ = "Andreas Lindhé"
 __license__ = "MIT"
-__version__ = "2.1.1"
+__version__ = "2.2.0"
 description = "Clones a Git repo into a specified path."
 
 
@@ -35,6 +36,7 @@ def main(
     dry_run: bool,
     git_location: str,
     git_repo: str,
+    group_by: str,
     verbose: int
 ):
     """ Clone the git repo """
@@ -43,10 +45,12 @@ def main(
               f"{dry_run=}, "
               f"{git_location=}, "
               f"{git_repo=}, "
+              f"{group_by=}, "
               f"{verbose=} "
               ")")
     target_path = get_path_from_uri(
         base_path=git_location,
+        group_by=group_by,
         repo_uri=git_repo,
         verbose=verbose
     )
@@ -82,6 +86,7 @@ def exit_if_target_exists(target_path: Path, verbose=0):
 
 def get_path_from_uri(
     base_path: str,
+    group_by: str,
     repo_uri: str,
     verbose=0
 ) -> Path:
@@ -89,20 +94,26 @@ def get_path_from_uri(
     if verbose > 1:
         print(f"\nget_path_from_uri( "
               f"{base_path=}, "
+              f"{group_by=}, "
               f"{repo_uri=} "
               ")"
               )
+    group = ""
     if re.match('^https://', repo_uri):
         # https://github.com/lindhe/scripts.git
         owner, name = repo_uri.removesuffix(".git").split("/")[-2:]
+        if group_by:
+            group = str(urlparse(repo_uri).hostname)
         if verbose > 1:
-            print(f"Matched HTTPS URI: {owner=}, {name=}")
+            print(f"Matched HTTPS URI: {group=}, {owner=}, {name=}")
     elif re.match('^git@', repo_uri):
         # git@github.com:lindhe/scripts.git
         uri_path = repo_uri.removesuffix(".git").split(':')[-1]
         owner, name = uri_path.split("/")[-2:]
+        if group_by:
+            group = str(urlparse(repo_uri).hostname)
         if verbose > 1:
-            print(f"Matched Git URI: {owner=}, {name=}")
+            print(f"Matched Git URI: {group=}, {owner=}, {name=}")
     else:
         print("Only the following protocols are supported in git-get:\n"
               "\tHTTPS (e.g. https://github.com/lindhe/scripts.git)\n"
@@ -110,7 +121,7 @@ def get_path_from_uri(
               "",
               file=sys.stderr)
         sys.exit(1)
-    return Path(base_path, owner, name)
+    return Path(base_path, group, owner, name)
 
 
 if __name__ == '__main__':
@@ -128,6 +139,12 @@ if __name__ == '__main__':
                    help="Overrides GLOBAL_GIT_LOCATION envvar as custom path"
                    " for storing git repos."
                    f" (default: {git_location})")
+    p.add_argument('--group-by',
+                   type=str,
+                   choices=['hostname'],
+                   help="Enables grouping into subdirectories "
+                   "in the git location."
+                   )
     p.add_argument('-v', '--verbose', action='count', default=0,
                    help="Verbosity level.")
     p.add_argument('-V', '--version', action='version', version=__version__)
@@ -141,7 +158,8 @@ if __name__ == '__main__':
             dry_run=args.dry_run,
             git_location=args.git_location,
             git_repo=args.git_repo,
-            verbose=args.verbose
+            verbose=args.verbose,
+            group_by=args.group_by
         )
     except KeyboardInterrupt:
         sys.exit("\nInterrupted by ^C\n")
