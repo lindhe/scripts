@@ -29,7 +29,7 @@ from urllib.parse import urlparse
 
 __author__ = "Andreas Lindhé"
 __license__ = "MIT"
-__version__ = "2.2.2"
+__version__ = "2.3.0"
 description = "Clones a Git repo into a specified path."
 
 
@@ -104,20 +104,36 @@ def get_path_from_uri(
         # git@github.com:lindhe/scripts.git
         uri_path = repo_uri.removesuffix(".git").split(':')[-1]
         owner, repo_name = uri_path.split("/")[-2:]
-        if group_by:
+        if group_by == "hostname":
             group = str(urlparse(repo_uri).hostname)
         if verbose > 1:
             print(f"Matched Git URI: {group=}, {owner=}, {repo_name=}")
     elif re.match('^https://', repo_uri):
-        # https://github.com/lindhe/scripts.git
-        owner, repo_name = repo_uri.removesuffix(".git").split("/")[-2:]
-        if group_by:
-            group = str(urlparse(repo_uri).hostname)
-        if verbose > 1:
-            print(f"Matched HTTPS URI: {group=}, {owner=}, {repo_name=}")
+        if re.match('.*@.*', repo_uri):
+            # https://foo@dev.azure.com/foo/bar/_git/baz
+            uri_parts = repo_uri.split('@')[1].split('/')
+            hostname, organization, project, _, repo_name = uri_parts
+            owner, repo_name = project, repo_name
+            if group_by == "hostname":
+                # dev.azure.com/org/proj/repo_name
+                group = f"{hostname}/{organization}"
+            elif group_by == "organization":
+                # org/proj/repo_name
+                group = organization
+            if verbose > 1:
+                print("Matched Plain Auth HTTPS URI: "
+                      f"{group=}, {owner=}, {repo_name=}")
+        else:
+            # https://github.com/lindhe/scripts.git
+            owner, repo_name = repo_uri.removesuffix(".git").split("/")[-2:]
+            if group_by == "hostname":
+                group = str(urlparse(repo_uri).hostname)
+            if verbose > 1:
+                print(f"Matched HTTPS URI: {group=}, {owner=}, {repo_name=}")
     else:
         print("Only the following protocols are supported in git-get:\n"
               "\tHTTPS (e.g. https://github.com/lindhe/scripts.git)\n"
+              "\tHTTPS Auth (e.g. https://foo@dev.azure.com/foo/bar/_git/baz)\n"  # nopep8
               "\tSSH (e.g. git@github.com:lindhe/scripts.git)\n"
               "",
               file=sys.stderr)
@@ -142,7 +158,11 @@ if __name__ == '__main__':
                    f" (default: {git_location})")
     p.add_argument('--group-by',
                    type=str,
-                   choices=['hostname'],
+                   choices=[
+                       'hostname',
+                       'organization',
+                       'project'
+                   ],
                    help="Enables grouping into subdirectories "
                    "in the git location."
                    )
