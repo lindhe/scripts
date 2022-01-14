@@ -16,6 +16,7 @@ a directory according to the repo owner in the URI.
 # - http://gitlab.example.com/lindhe/dotfiles
 # - https://github.com/lindhe/dotfiles.git
 # - git@github.com:lindhe/dotfiles.git
+# - https://foo@dev.azure.com/foo/bar/_git/baz
 
 
 import argparse
@@ -28,7 +29,7 @@ from urllib.parse import urlparse
 
 __author__ = "Andreas Lindhé"
 __license__ = "MIT"
-__version__ = "2.2.0"
+__version__ = "2.2.1"
 description = "Clones a Git repo into a specified path."
 
 
@@ -99,14 +100,7 @@ def get_path_from_uri(
               ")"
               )
     group = ""
-    if re.match('^https://', repo_uri):
-        # https://github.com/lindhe/scripts.git
-        owner, name = repo_uri.removesuffix(".git").split("/")[-2:]
-        if group_by:
-            group = str(urlparse(repo_uri).hostname)
-        if verbose > 1:
-            print(f"Matched HTTPS URI: {group=}, {owner=}, {name=}")
-    elif re.match('^git@', repo_uri):
+    if re.match('^git@', repo_uri):
         # git@github.com:lindhe/scripts.git
         uri_path = repo_uri.removesuffix(".git").split(':')[-1]
         owner, name = uri_path.split("/")[-2:]
@@ -114,6 +108,13 @@ def get_path_from_uri(
             group = str(urlparse(repo_uri).hostname)
         if verbose > 1:
             print(f"Matched Git URI: {group=}, {owner=}, {name=}")
+    elif re.match('^https://', repo_uri):
+        # https://github.com/lindhe/scripts.git
+        owner, name = repo_uri.removesuffix(".git").split("/")[-2:]
+        if group_by:
+            group = str(urlparse(repo_uri).hostname)
+        if verbose > 1:
+            print(f"Matched HTTPS URI: {group=}, {owner=}, {name=}")
     else:
         print("Only the following protocols are supported in git-get:\n"
               "\tHTTPS (e.g. https://github.com/lindhe/scripts.git)\n"
