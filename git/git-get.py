@@ -16,7 +16,8 @@ a directory according to the repo owner in the URI.
 # - http://gitlab.example.com/lindhe/dotfiles
 # - https://github.com/lindhe/dotfiles.git
 # - git@github.com:lindhe/dotfiles.git
-# - https://foo@dev.azure.com/foo/bar/_git/baz
+# - https://org@dev.azure.com/org/proj/_git/repo
+# - https://org.visualstudio.com/proj/_git/repo
 
 
 import argparse
@@ -110,7 +111,7 @@ def get_path_from_uri(
             print(f"Matched Git URI: {group=}, {owner=}, {repo_name=}")
     elif re.match('^https://', repo_uri):
         if re.match('.*@.*', repo_uri):
-            # https://foo@dev.azure.com/foo/bar/_git/baz
+            # https://org@dev.azure.com/org/proj/_git/repo
             uri_parts = repo_uri.split('@')[1].split('/')
             hostname, organization, project, _, repo_name = uri_parts
             owner, repo_name = project, repo_name
@@ -133,7 +134,7 @@ def get_path_from_uri(
     else:
         print("Only the following protocols are supported in git-get:\n"
               "\tHTTPS (e.g. https://github.com/lindhe/scripts.git)\n"
-              "\tHTTPS Auth (e.g. https://foo@dev.azure.com/foo/bar/_git/baz)\n"  # nopep8
+              "\tHTTPS Auth (e.g. https://org@dev.azure.com/org/proj/_git/repo)\n"  # nopep8
               "\tSSH (e.g. git@github.com:lindhe/scripts.git)\n"
               "",
               file=sys.stderr)
