@@ -3,14 +3,14 @@
 
 set -euo pipefail
 
-if [ $# -eq 0 ]; then
+if [ ! $# -eq 2 ]; then
   echo "USAGE:"
   echo ""
   echo "  ${0} PROGRAM VERSION"
   echo ""
   echo "EXAMPLE:"
   echo ""
-  echo "  ${0} helmfile 0.144.0"
+  echo "  ${0} helmfile 0.145.0"
   echo ""
   echo "SUPPORTED PROGRAMS:"
   echo ""
