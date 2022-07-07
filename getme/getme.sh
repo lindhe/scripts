@@ -16,6 +16,7 @@ if [ $# -lt 1 ]; then
   echo ""
   echo "  helmfile"
   echo "  git-credential-manager"
+  echo "  k3d"
   exit
 fi
 
@@ -74,6 +75,15 @@ elif [[ "${PROGRAM}" == "git-credential-manager" ]]; then
             '.*gcm-linux_amd64.*.deb'
     )
     readonly PACKAGE_FORMAT="deb"
+elif [[ "${PROGRAM}" == "k3d" ]]; then
+    readonly DOWNLOAD_URL=$(
+        get_gh_release_url \
+            "k3d-io" "${PROGRAM}" \
+            "${VERSION_PREFIX}${VERSION}" \
+            'k3d-linux-amd64'
+    )
+    readonly PACKAGE_FORMAT="bin"
+    readonly DOWNLOAD_FORMAT="PLAIN"
 else
     echo "❌ ERROR: program ${PROGRAM} not supported."
     exit 1
@@ -82,10 +92,11 @@ fi
 
 ##########################     Download & Install     ##########################
 DOWNLOAD_DIR=$(mktemp -d)
-
 FILENAME=$(basename "${DOWNLOAD_URL}")
 echo "⏳ Downloading ${PROGRAM} …"
-if [[ "${FILENAME}" == *.tar.gz ]]; then
+if [[ "${DOWNLOAD_FORMAT:-x}" == "PLAIN" ]]; then
+    wget -qO "${DOWNLOAD_DIR}/${PROGRAM}" "${DOWNLOAD_URL}"
+elif [[ "${FILENAME}" == *.tar.gz ]]; then
     wget -qO - "${DOWNLOAD_URL}" | tar -xzC "${DOWNLOAD_DIR}"
 elif [[ "${FILENAME}" == *.deb ]]; then
     wget -qo "${DOWNLOAD_DIR}/${FILENAME}" "${DOWNLOAD_URL}"
@@ -94,13 +105,14 @@ else
     echo -e "  DIR:\t\t${DOWNLOAD_DIR}"
     echo -e "  URL:\t\t${DOWNLOAD_URL}"
     echo -e "  FILENAME:\t${FILENAME}"
+    echo -e "  DOWNLOAD_FORMAT:\t${DOWNLOAD_FORMAT:-None}"
     exit 1
 fi
 echo "✅ Download complete!"
 
 echo "⌛ Installing ${PROGRAM} …"
 if [[ "${PACKAGE_FORMAT}" == "bin" ]]; then
-    sudo install "${DOWNLOAD_DIR}/${PROGRAM}" /usr/local/bin
+    sudo install "${DOWNLOAD_DIR}/${PROGRAM}" /usr/local/bin/
 elif [[ "${PACKAGE_FORMAT}" == "deb" ]]; then
     sudo apt install "${DOWNLOAD_DIR}/${PROGRAM}.deb"
 else
