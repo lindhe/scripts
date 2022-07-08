@@ -6,6 +6,11 @@ stderr() {
     echo "$@" >&2
 }
 
+fail() {
+    echo "FAILURE: ${1}" >&2
+    exit "${2:-1}"
+}
+
 if [[ -n ${VERBOSE+x} ]]; then
     stderr "GetMe"
     stderr "  …some programs!"
@@ -83,7 +88,7 @@ get_gh_release_url() {
     local -r RELEASE_JSON=$(
         curl --silent -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${OWNER}/${REPO}/releases/${RELEASE}"
-    )
+    ) || fail "Unable to get RELEASE_JSON from GitHub."
 
     jq -r "
         .assets[]
@@ -91,7 +96,8 @@ get_gh_release_url() {
         select(.name | test(\"${REGEX}\"))
         |
         .browser_download_url
-    " <(echo "${RELEASE_JSON}")
+    " <(echo "${RELEASE_JSON}") \
+        || fail "Unable to parse RELEASE_JSON."
 
 }
 
@@ -125,8 +131,7 @@ elif [[ "${PROGRAM}" == "k3d" ]]; then
     readonly PACKAGE_FORMAT="bin"
     readonly DOWNLOAD_FORMAT="PLAIN"
 else
-    stderr "❌ ERROR: program ${PROGRAM} not supported."
-    exit 1
+    fail "❌ ERROR: program ${PROGRAM} not supported."
 fi
 
 if [[ -n ${VERBOSE+x} ]]; then
@@ -144,11 +149,14 @@ DOWNLOAD_DIR=$(mktemp -d)
 FILENAME=$(basename "${DOWNLOAD_URL}")
 echo "⏳ Downloading ${PROGRAM} …"
 if [[ "${DOWNLOAD_FORMAT:-x}" == "PLAIN" ]]; then
-    wget -qO "${DOWNLOAD_DIR}/${PROGRAM}" "${DOWNLOAD_URL}"
+    wget -qO "${DOWNLOAD_DIR}/${PROGRAM}" "${DOWNLOAD_URL}" \
+        || fail "Unable to download ${PROGRAM} (PLAIN)."
 elif [[ "${FILENAME}" == *.tar.gz ]]; then
-    wget -qO - "${DOWNLOAD_URL}" | tar -xzC "${DOWNLOAD_DIR}"
+    wget -qO - "${DOWNLOAD_URL}" | tar -xzC "${DOWNLOAD_DIR}" \
+        || fail "Unable to download ${PROGRAM} (tar.gz)"
 elif [[ "${FILENAME}" == *.deb ]]; then
-    wget -qo "${DOWNLOAD_DIR}/${FILENAME}" "${DOWNLOAD_URL}"
+    wget -qo "${DOWNLOAD_DIR}/${FILENAME}" "${DOWNLOAD_URL}" \
+        || fail "Unable to download ${PROGRAM} (deb)"
 else
     stderr "ERROR: Could not download ${PROGRAM}  ¯\_(ツ)_/¯"
     stderr -e "  DIR:\t\t${DOWNLOAD_DIR}"
@@ -170,9 +178,11 @@ fi
 ###############################     Install     ###############################
 echo "⌛ Installing ${PROGRAM} …"
 if [[ "${PACKAGE_FORMAT}" == "bin" ]]; then
-    sudo install "${DOWNLOAD_DIR}/${PROGRAM}" /usr/local/bin/
+    sudo install "${DOWNLOAD_DIR}/${PROGRAM}" /usr/local/bin/ \
+        || fail "Unable to install executable ${DOWNLOAD_DIR}/${PROGRAM}"
 elif [[ "${PACKAGE_FORMAT}" == "deb" ]]; then
-    sudo apt install "${DOWNLOAD_DIR}/${PROGRAM}.deb"
+    sudo apt install "${DOWNLOAD_DIR}/${PROGRAM}.deb" \
+        || fail "Unable to install ${DOWNLOAD_DIR}/${PROGRAM}.deb"
 elif [[ "${PACKAGE_FORMAT}" == "bash" ]]; then
     if [[ "${PROGRAM}" == "helm" ]]; then
         if [[ "${ARG_VERSION}" != "latest" ]]; then
@@ -180,11 +190,11 @@ elif [[ "${PACKAGE_FORMAT}" == "bash" ]]; then
         else
             readonly HELM_VER=""
         fi
-        bash "${DOWNLOAD_DIR}/${PROGRAM}" ${HELM_VER}
+        bash "${DOWNLOAD_DIR}/${PROGRAM}" ${HELM_VER} \
+            || fail "Unable to install Helm: ${DOWNLOAD_DIR}/${PROGRAM}"
     fi
 else
-    stderr "ERROR: Package format was ${PACKAGE_FORMAT}  ¯\_(ツ)_/¯"
-    exit 1
+    fail "ERROR: Package format was ${PACKAGE_FORMAT}  ¯\_(ツ)_/¯"
 fi
 echo "😀 Installation complete!"
 
