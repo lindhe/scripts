@@ -33,6 +33,7 @@ if [ $# -lt 1 ]; then
   stderr "  helmfile"
   stderr "  git-credential-manager"
   stderr "  k3d"
+  stderr "  sops"
   exit
 fi
 
@@ -128,6 +129,14 @@ elif [[ "${PROGRAM}" == "k3d" ]]; then
             'k3d-linux-amd64'
     )
     readonly PACKAGE_FORMAT="bin"
+elif [[ "${PROGRAM}" == "sops" ]]; then
+    readonly DOWNLOAD_URL=$(
+        get_gh_release_url \
+            "mozilla" "${PROGRAM}" \
+            "${VERSION}" \
+            '.*_amd64.deb'
+    )
+    readonly PACKAGE_FORMAT="deb"
 else
     fail "❌ ERROR: program ${PROGRAM} not supported."
 fi
