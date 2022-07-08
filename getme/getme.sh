@@ -2,22 +2,32 @@
 
 set -euo pipefail
 
+stderr() {
+    echo "$@" >&2
+}
+
+if [[ -n ${VERBOSE+x} ]]; then
+    stderr "GetMe"
+    stderr "  …some programs!"
+    stderr ""
+fi
+
 if [ $# -lt 1 ]; then
-  echo "USAGE:"
-  echo ""
-  echo "  ${0} PROGRAM [VERSION]"
-  echo ""
-  echo "EXAMPLES:"
-  echo ""
-  echo "  ${0} helmfile 0.145.0"
-  echo "  ${0} helmfile latest"
-  echo ""
-  echo "SUPPORTED PROGRAMS:"
-  echo ""
-  echo "  helm"
-  echo "  helmfile"
-  echo "  git-credential-manager"
-  echo "  k3d"
+  stderr "USAGE:"
+  stderr ""
+  stderr "  ${0} PROGRAM [VERSION]"
+  stderr ""
+  stderr "EXAMPLES:"
+  stderr ""
+  stderr "  ${0} helmfile 0.145.0"
+  stderr "  ${0} helmfile latest"
+  stderr ""
+  stderr "SUPPORTED PROGRAMS:"
+  stderr ""
+  stderr "  helm"
+  stderr "  helmfile"
+  stderr "  git-credential-manager"
+  stderr "  k3d"
   exit
 fi
 
@@ -32,17 +42,42 @@ else
     readonly VERSION="${NORM_VERSION}"
 fi
 
+if [[ -n ${VERBOSE+x} ]]; then
+    stderr ""
+    stderr "Version"
+    stderr "  ARG_VERSION:  ${ARG_VERSION:-None}"
+    stderr "  NORM_VERSION: ${NORM_VERSION:-None}"
+    stderr "  VERSION:      ${VERSION:-None}"
+    stderr ""
+fi
+
 get_gh_release_url() {
     local -r OWNER="${1}"
     local -r REPO="${2}"
     local -r TAG="${3:-latest}"
     local -r REGEX="${4:-linux_amd64}"
 
+    if [[ -n ${VERBOSE+x} ]]; then
+        stderr ""
+        stderr "get_gh_release_url()"
+        stderr "  OWNER: ${OWNER:-None}"
+        stderr "  REPO:  ${REPO:-None}"
+        stderr "  TAG:   ${TAG:-None}"
+        stderr "  REGEX: ${REGEX:-None}"
+        stderr ""
+    fi
+
     # Set RELEASE differently depending on if TAG is latest or not
     if [[ "${TAG}" != "latest" ]]; then
         RELEASE="tags/${TAG}"
     else
         RELEASE="latest"
+    fi
+
+    if [[ -n ${VERBOSE+x} ]]; then
+        stderr ""
+        stderr "RELEASE: ${RELEASE:-None}"
+        stderr ""
     fi
 
     local -r RELEASE_JSON=$(
@@ -90,12 +125,21 @@ elif [[ "${PROGRAM}" == "k3d" ]]; then
     readonly PACKAGE_FORMAT="bin"
     readonly DOWNLOAD_FORMAT="PLAIN"
 else
-    echo "❌ ERROR: program ${PROGRAM} not supported."
+    stderr "❌ ERROR: program ${PROGRAM} not supported."
     exit 1
 fi
 
+if [[ -n ${VERBOSE+x} ]]; then
+    stderr ""
+    stderr "Program Selector"
+    stderr "  PROGRAM:        ${PROGRAM:-None}"
+    stderr "  VERSION:        ${VERSION:-None}"
+    stderr "  DOWNLOAD_URL:   ${DOWNLOAD_URL:-None}"
+    stderr "  PACKAGE_FORMAT: ${PACKAGE_FORMAT:-None}"
+    stderr ""
+fi
 
-##########################     Download & Install     ##########################
+###############################     Download     ###############################
 DOWNLOAD_DIR=$(mktemp -d)
 FILENAME=$(basename "${DOWNLOAD_URL}")
 echo "⏳ Downloading ${PROGRAM} …"
@@ -106,15 +150,24 @@ elif [[ "${FILENAME}" == *.tar.gz ]]; then
 elif [[ "${FILENAME}" == *.deb ]]; then
     wget -qo "${DOWNLOAD_DIR}/${FILENAME}" "${DOWNLOAD_URL}"
 else
-    echo "ERROR: Could not download ${PROGRAM}  ¯\_(ツ)_/¯"
-    echo -e "  DIR:\t\t${DOWNLOAD_DIR}"
-    echo -e "  URL:\t\t${DOWNLOAD_URL}"
-    echo -e "  FILENAME:\t${FILENAME}"
-    echo -e "  DOWNLOAD_FORMAT:\t${DOWNLOAD_FORMAT:-None}"
+    stderr "ERROR: Could not download ${PROGRAM}  ¯\_(ツ)_/¯"
+    stderr -e "  DIR:\t\t${DOWNLOAD_DIR}"
+    stderr -e "  URL:\t\t${DOWNLOAD_URL}"
+    stderr -e "  FILENAME:\t${FILENAME}"
+    stderr -e "  DOWNLOAD_FORMAT:\t${DOWNLOAD_FORMAT:-None}"
     exit 1
 fi
 echo "✅ Download complete!"
 
+if [[ -n ${VERBOSE+x} ]]; then
+    stderr ""
+    stderr "Download"
+    stderr "  DOWNLOAD_DIR: ${DOWNLOAD_DIR:-None}"
+    stderr "  FILENAME:     ${FILENAME:-None}"
+    stderr ""
+fi
+
+###############################     Install     ###############################
 echo "⌛ Installing ${PROGRAM} …"
 if [[ "${PACKAGE_FORMAT}" == "bin" ]]; then
     sudo install "${DOWNLOAD_DIR}/${PROGRAM}" /usr/local/bin/
@@ -130,7 +183,7 @@ elif [[ "${PACKAGE_FORMAT}" == "bash" ]]; then
         bash "${DOWNLOAD_DIR}/${PROGRAM}" ${HELM_VER}
     fi
 else
-    echo "ERROR: Package format was ${PACKAGE_FORMAT}  ¯\_(ツ)_/¯"
+    stderr "ERROR: Package format was ${PACKAGE_FORMAT}  ¯\_(ツ)_/¯"
     exit 1
 fi
 echo "😀 Installation complete!"
