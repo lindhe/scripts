@@ -14,6 +14,7 @@ if [ $# -lt 1 ]; then
   echo ""
   echo "SUPPORTED PROGRAMS:"
   echo ""
+  echo "  helm"
   echo "  helmfile"
   echo "  git-credential-manager"
   echo "  k3d"
@@ -60,7 +61,11 @@ else
     readonly VERSION="${NORM_VERSION}"
 fi
 
-if [[ "${PROGRAM}" == "helmfile" ]]; then
+if [[ "${PROGRAM}" == "helm" ]]; then
+    readonly DOWNLOAD_URL="https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3"
+    readonly PACKAGE_FORMAT="bash"
+    readonly DOWNLOAD_FORMAT="PLAIN"
+elif [[ "${PROGRAM}" == "helmfile" ]]; then
     readonly DOWNLOAD_URL=$(
         get_gh_release_url \
             "${PROGRAM}" "${PROGRAM}" \
@@ -115,6 +120,15 @@ if [[ "${PACKAGE_FORMAT}" == "bin" ]]; then
     sudo install "${DOWNLOAD_DIR}/${PROGRAM}" /usr/local/bin/
 elif [[ "${PACKAGE_FORMAT}" == "deb" ]]; then
     sudo apt install "${DOWNLOAD_DIR}/${PROGRAM}.deb"
+elif [[ "${PACKAGE_FORMAT}" == "bash" ]]; then
+    if [[ "${PROGRAM}" == "helm" ]]; then
+        if [[ "${ARG_VERSION}" != "latest" ]]; then
+            readonly HELM_VER="--version ${VERSION}"
+        else
+            readonly HELM_VER=""
+        fi
+        bash "${DOWNLOAD_DIR}/${PROGRAM}" ${HELM_VER}
+    fi
 else
     echo "ERROR: Package format was ${PACKAGE_FORMAT}  ¯\_(ツ)_/¯"
     exit 1
