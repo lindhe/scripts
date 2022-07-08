@@ -169,6 +169,7 @@ if [[ "${PACKAGE_FORMAT}" == "bin" ]]; then
     sudo install "${DOWNLOAD_DIR}/${FILENAME}" /usr/local/bin/ \
         || fail "Unable to install executable ${DOWNLOAD_DIR}/${PROGRAM}"
 elif [[ "${PACKAGE_FORMAT}" == "deb" ]]; then
+    sudo chown -R _apt:root "${DOWNLOAD_DIR}"  # Not sure why, but apt has a warning when installing from $(mktemp -d) unless I chown it like so. https://askubuntu.com/a/1205517/80226
     sudo apt install "${DOWNLOAD_DIR}/${FILENAME}" \
         || fail "Unable to install deb ${DOWNLOAD_DIR}/${FILENAME}"
 elif [[ "${PACKAGE_FORMAT}" == "bash" ]]; then
