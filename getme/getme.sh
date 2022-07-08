@@ -105,7 +105,6 @@ get_gh_release_url() {
 if [[ "${PROGRAM}" == "helm" ]]; then
     readonly DOWNLOAD_URL="https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3"
     readonly PACKAGE_FORMAT="bash"
-    readonly DOWNLOAD_FORMAT="PLAIN"
 elif [[ "${PROGRAM}" == "helmfile" ]]; then
     readonly DOWNLOAD_URL=$(
         get_gh_release_url \
@@ -129,7 +128,6 @@ elif [[ "${PROGRAM}" == "k3d" ]]; then
             'k3d-linux-amd64'
     )
     readonly PACKAGE_FORMAT="bin"
-    readonly DOWNLOAD_FORMAT="PLAIN"
 else
     fail "❌ ERROR: program ${PROGRAM} not supported."
 fi
@@ -148,22 +146,12 @@ fi
 DOWNLOAD_DIR=$(mktemp -d)
 FILENAME=$(basename "${DOWNLOAD_URL}")
 echo "⏳ Downloading ${PROGRAM} …"
-if [[ "${DOWNLOAD_FORMAT:-x}" == "PLAIN" ]]; then
-    wget -qO "${DOWNLOAD_DIR}/${PROGRAM}" "${DOWNLOAD_URL}" \
-        || fail "Unable to download ${PROGRAM} (PLAIN)."
-elif [[ "${FILENAME}" == *.tar.gz ]]; then
+if [[ "${FILENAME}" == *.tar.gz ]]; then
     wget -qO - "${DOWNLOAD_URL}" | tar -xzC "${DOWNLOAD_DIR}" \
-        || fail "Unable to download ${PROGRAM} (tar.gz)"
-elif [[ "${FILENAME}" == *.deb ]]; then
-    wget -qo "${DOWNLOAD_DIR}/${FILENAME}" "${DOWNLOAD_URL}" \
-        || fail "Unable to download ${PROGRAM} (deb)"
+        || fail "Unable to download ${DOWNLOAD_URL}"
 else
-    stderr "ERROR: Could not download ${PROGRAM}  ¯\_(ツ)_/¯"
-    stderr -e "  DIR:\t\t${DOWNLOAD_DIR}"
-    stderr -e "  URL:\t\t${DOWNLOAD_URL}"
-    stderr -e "  FILENAME:\t${FILENAME}"
-    stderr -e "  DOWNLOAD_FORMAT:\t${DOWNLOAD_FORMAT:-None}"
-    exit 1
+    wget -qO "${DOWNLOAD_DIR}/${FILENAME}" "${DOWNLOAD_URL}" \
+        || fail "Unable to download ${DOWNLOAD_URL}"
 fi
 echo "✅ Download complete!"
 
@@ -178,11 +166,11 @@ fi
 ###############################     Install     ###############################
 echo "⌛ Installing ${PROGRAM} …"
 if [[ "${PACKAGE_FORMAT}" == "bin" ]]; then
-    sudo install "${DOWNLOAD_DIR}/${PROGRAM}" /usr/local/bin/ \
+    sudo install "${DOWNLOAD_DIR}/${FILENAME}" /usr/local/bin/ \
         || fail "Unable to install executable ${DOWNLOAD_DIR}/${PROGRAM}"
 elif [[ "${PACKAGE_FORMAT}" == "deb" ]]; then
-    sudo apt install "${DOWNLOAD_DIR}/${PROGRAM}.deb" \
-        || fail "Unable to install ${DOWNLOAD_DIR}/${PROGRAM}.deb"
+    sudo apt install "${DOWNLOAD_DIR}/${FILENAME}" \
+        || fail "Unable to install deb ${DOWNLOAD_DIR}/${FILENAME}"
 elif [[ "${PACKAGE_FORMAT}" == "bash" ]]; then
     if [[ "${PROGRAM}" == "helm" ]]; then
         if [[ "${ARG_VERSION}" != "latest" ]]; then
@@ -190,8 +178,8 @@ elif [[ "${PACKAGE_FORMAT}" == "bash" ]]; then
         else
             readonly HELM_VER=""
         fi
-        bash "${DOWNLOAD_DIR}/${PROGRAM}" ${HELM_VER} \
-            || fail "Unable to install Helm: ${DOWNLOAD_DIR}/${PROGRAM}"
+        bash "${DOWNLOAD_DIR}/${FILENAME}" ${HELM_VER} \
+            || fail "Unable to install Helm: ${DOWNLOAD_DIR}/${FILENAME}"
     fi
 else
     fail "ERROR: Package format was ${PACKAGE_FORMAT}  ¯\_(ツ)_/¯"
