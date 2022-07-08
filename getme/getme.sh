@@ -25,6 +25,13 @@ readonly PROGRAM="${1}"
 readonly ARG_VERSION="${2:-latest}"
 readonly NORM_VERSION="${ARG_VERSION/#v}" # Normalize v1.2.3 to 1.2.3
 
+# Ensure we only prefix numeric versions with v
+if [[ "${NORM_VERSION::1}" =~ [[:digit:]] ]]; then
+    readonly VERSION="v${NORM_VERSION}"
+else
+    readonly VERSION="${NORM_VERSION}"
+fi
+
 get_gh_release_url() {
     local -r OWNER="${1}"
     local -r REPO="${2}"
@@ -54,13 +61,6 @@ get_gh_release_url() {
 }
 
 ###########################     Program selector     ###########################
-# Ensure we only prefix numeric versions with v
-if [[ "${NORM_VERSION::1}" =~ [[:digit:]] ]]; then
-    readonly VERSION="v${NORM_VERSION}"
-else
-    readonly VERSION="${NORM_VERSION}"
-fi
-
 if [[ "${PROGRAM}" == "helm" ]]; then
     readonly DOWNLOAD_URL="https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3"
     readonly PACKAGE_FORMAT="bash"
