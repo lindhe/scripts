@@ -33,6 +33,7 @@ if [ $# -lt 1 ]; then
   stderr "  helmfile"
   stderr "  git-credential-manager"
   stderr "  k3d"
+  stderr "  nvm"
   stderr "  sops"
   exit
 fi
@@ -129,6 +130,13 @@ elif [[ "${PROGRAM}" == "k3d" ]]; then
             'k3d-linux-amd64'
     )
     readonly PACKAGE_FORMAT="bin"
+elif [[ "${PROGRAM}" == "nvm" ]]; then
+    if [[ "${ARG_VERSION}" == "latest" ]]; then
+        readonly DOWNLOAD_URL="https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh"
+    else
+        readonly DOWNLOAD_URL="https://raw.githubusercontent.com/nvm-sh/nvm/${VERSION}/install.sh"
+    fi
+    readonly PACKAGE_FORMAT="bash"
 elif [[ "${PROGRAM}" == "sops" ]]; then
     readonly DOWNLOAD_URL=$(
         get_gh_release_url \
@@ -190,6 +198,9 @@ elif [[ "${PACKAGE_FORMAT}" == "bash" ]]; then
         fi
         bash "${DOWNLOAD_DIR}/${FILENAME}" ${HELM_VER} \
             || fail "Unable to install Helm: ${DOWNLOAD_DIR}/${FILENAME}"
+    else
+        bash "${DOWNLOAD_DIR}/${FILENAME}" \
+            || fail "Unable to install ${PROGRAM}: ${DOWNLOAD_DIR}/${FILENAME}"
     fi
 else
     fail "ERROR: Package format was ${PACKAGE_FORMAT}  ¯\_(ツ)_/¯"
