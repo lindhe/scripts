@@ -21,8 +21,8 @@ if [ $# -lt 1 ]; then
 fi
 
 readonly PROGRAM="${1}"
-readonly VERSION_NUMBER="${2:-latest}"
-readonly VERSION="${VERSION_NUMBER/#v}" # Normalize v1.2.3 to 1.2.3
+readonly ARG_VERSION="${2:-latest}"
+readonly NORM_VERSION="${ARG_VERSION/#v}" # Normalize v1.2.3 to 1.2.3
 
 get_gh_release_url() {
     local -r OWNER="${1}"
@@ -53,25 +53,25 @@ get_gh_release_url() {
 }
 
 ###########################     Program selector     ###########################
-# Ensure we won't prefix latest with v
-if [[ "${VERSION}" == "latest" ]]; then
-    readonly VERSION_PREFIX=""
+# Ensure we only prefix numeric versions with v
+if [[ "${NORM_VERSION::1}" =~ [[:digit:]] ]]; then
+    readonly VERSION="v${NORM_VERSION}"
 else
-    readonly VERSION_PREFIX="v"
+    readonly VERSION="${NORM_VERSION}"
 fi
 
 if [[ "${PROGRAM}" == "helmfile" ]]; then
     readonly DOWNLOAD_URL=$(
         get_gh_release_url \
             "${PROGRAM}" "${PROGRAM}" \
-            "${VERSION_PREFIX}${VERSION}"
+            "${VERSION}"
     )
     readonly PACKAGE_FORMAT="bin"
 elif [[ "${PROGRAM}" == "git-credential-manager" ]]; then
     readonly DOWNLOAD_URL=$(
         get_gh_release_url \
             "GitCredentialManager" "${PROGRAM}" \
-            "${VERSION_PREFIX}${VERSION}" \
+            "${VERSION}" \
             '.*gcm-linux_amd64.*.deb'
     )
     readonly PACKAGE_FORMAT="deb"
@@ -79,7 +79,7 @@ elif [[ "${PROGRAM}" == "k3d" ]]; then
     readonly DOWNLOAD_URL=$(
         get_gh_release_url \
             "k3d-io" "${PROGRAM}" \
-            "${VERSION_PREFIX}${VERSION}" \
+            "${VERSION}" \
             'k3d-linux-amd64'
     )
     readonly PACKAGE_FORMAT="bin"
