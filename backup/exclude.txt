@@ -7,7 +7,9 @@
 + /opt
 + /root
 + /sbin
++ /snap
 + /usr
++ /var
 - /*
 - Trash
 - .cache/*
