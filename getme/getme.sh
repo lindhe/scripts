@@ -35,6 +35,7 @@ if [ $# -lt 1 ]; then
   stderr "  k3d"
   stderr "  nvm"
   stderr "  sops"
+  stderr "  yq"
   exit
 fi
 
@@ -145,6 +146,14 @@ elif [[ "${PROGRAM}" == "sops" ]]; then
             '.*_amd64.deb'
     )
     readonly PACKAGE_FORMAT="deb"
+elif [[ "${PROGRAM}" == "yq" ]]; then
+    readonly DOWNLOAD_URL=$(
+        get_gh_release_url \
+            "mikefarah" "${PROGRAM}" \
+            "${VERSION}" \
+            '.*_linux_amd64$'
+    )
+    readonly PACKAGE_FORMAT="bin"
 else
     fail "❌ ERROR: program ${PROGRAM} not supported."
 fi
