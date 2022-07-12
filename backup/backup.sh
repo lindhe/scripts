@@ -22,6 +22,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set -euo pipefail
+
 # The first argument given, $1, will be treated as the --max-size
 # If $1 is empty, --max-size is not used.
 MAX_SIZE="${1:+--max-size ${1}}"
