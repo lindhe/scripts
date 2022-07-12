@@ -9,6 +9,7 @@
 + /sbin
 + /snap
 + /usr
+- /var/log/journal
 + /var
 - /*
 - Trash
