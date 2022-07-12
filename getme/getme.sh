@@ -161,7 +161,8 @@ fi
 
 ###############################     Download     ###############################
 DOWNLOAD_DIR=$(mktemp -d)
-FILENAME=$(basename "${DOWNLOAD_URL}")
+readonly FILENAME=$(basename "${DOWNLOAD_URL}")
+
 echo "⏳ Downloading ${PROGRAM} …"
 if [[ "${FILENAME}" == *.tar.gz ]]; then
     wget -qO - "${DOWNLOAD_URL}" | tar -xzC "${DOWNLOAD_DIR}" \
