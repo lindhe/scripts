@@ -35,13 +35,14 @@ date '+%s' > ${BACKUP_SCRIPT_DIR}/alive
 
 HOST=$(hostname)
 RUN=false;
-AUTHFILE=${BACKUP_SCRIPT_DIR}/authorized_networks.txt;
 CHARGING=$(acpi --ac-adapter | grep "on-line")
 WLAN_SSID=$(iwgetid --raw);
 LIST_OF_ETH_IF=(
     eth0
     eth1
 )
+
+WLAN_IS_METERED="$(nmcli -g connection.metered connection show ${WLAN_SSID})"
 
 # print to both stdout and log
 logprint () {
@@ -79,20 +80,12 @@ if [ ! -z "$CHARGING" ] || [ ! -z "${MAX_SIZE}" ]; then
     if [[ "${CONNECTED_VIA_ETHERNET}" = "true" ]]; then
         logprint "Performing backup over Ethernet (${DEFAULT_ROUTE_DEV})";
         RUN=true;
-    # If there's a whitelist defined, match WLAN_SSID against that list.
-    elif [ -f $AUTHFILE ]; then
-        if [ ! -z "$WLAN_SSID" ]; then
-            if [ ! -z "$(grep -e "^$WLAN_SSID$" "$AUTHFILE")" ]; then
-                logprint "Performing backup over Wi-fi: $WLAN_SSID";
-                RUN=true;
-            else
-                logprint_err "Prohibited backup due to unauthorized Wi-fi: $WLAN_SSID";
-            fi
-        else
-            logprint_err "Could not identify network connection. Prohibiting backup."
-        fi
+    # WLAN is OK if it's not metered
+    elif [[ "${WLAN_IS_METERED}" == "no" ]]; then
+        logprint "Performing backup over Wi-fi: $WLAN_SSID";
+        RUN=true;
     else
-        logprint_err 'No AUTHFILE found! Prohibiting backup over WLAN.';
+        logprint_err "Prohibited backup since ${WLAN_SSID} is metered.";
     fi
 else
     logprint_err "Not charging. Prohibiting backup."
