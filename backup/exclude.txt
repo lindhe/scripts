@@ -19,3 +19,7 @@
 - tmp/*
 - no-backup
 - Downloads/*
+- **/dev/null
+- **/dev/random
+- **/dev/urandom
+- **/dev/zero
