@@ -22,7 +22,7 @@ if [[ -z ${DEBUG+x} ]]; then
     fi
 fi
 
-readonly TARGET_BACKUP_DIR=${1:-/mnt/backup/nextcloud}
+readonly TARGET_BACKUP_DIR=${1}
 verbose "TARGET_BACKUP_DIR=${TARGET_BACKUP_DIR}"
 
 verbose "Starting backup …"
