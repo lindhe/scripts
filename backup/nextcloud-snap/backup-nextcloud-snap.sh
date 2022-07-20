@@ -25,7 +25,7 @@ fi
 readonly TARGET_BACKUP_DIR=${1}
 verbose "TARGET_BACKUP_DIR=${TARGET_BACKUP_DIR}"
 
-verbose "Starting backup …"
+verbose "Backup started …"
 if [[ -n ${DEBUG+x} ]]; then
     readonly NC_EXPORT="Successfully exported /var/snap/nextcloud/common/backups/20220720-194312"
 else
