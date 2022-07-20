@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-WARN_LARGE_SIZE="${MAX_ARCHIVE_SIZE:-$((1024**4))}"  # Size in KiB
+MAX_ARCHIVE_SIZE="${MAX_ARCHIVE_SIZE:-$((1024**4))}"  # Size in KiB
 
 verbose() {
     if [[ -n ${VERBOSE+x} ]]; then
@@ -67,8 +67,8 @@ fi
 verbose "Clean-up complete!"
 
 if [[ -z ${DEBUG+x} ]]; then
-    if [[ $(du -k "${TARGET_BACKUP_DIR}") -ge ${WARN_LARGE_SIZE} ]]; then
-        echo "WARNING: Backup archive size is greater than ${WARN_LARGE_SIZE} …" 1>&2
+    if [[ $(du -k "${TARGET_BACKUP_DIR}") -ge ${MAX_ARCHIVE_SIZE} ]]; then
+        echo "WARNING: Backup archive size is greater than ${MAX_ARCHIVE_SIZE} …" 1>&2
         echo "Please check ${TARGET_BACKUP_DIR}" 1>&2
     fi
 fi
