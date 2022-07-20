@@ -29,7 +29,7 @@ verbose "Starting backup …"
 if [[ -n ${DEBUG+x} ]]; then
     readonly NC_EXPORT="Successfully exported /var/snap/nextcloud/common/backups/20220720-194312"
 else
-    readonly NC_EXPORT=$(nextcloud.export | grep "Successfully exported")
+    readonly NC_EXPORT=$(nextcloud.export 2> /dev/null | grep "Successfully exported")
 fi
 
 if [[ $? -eq 0 ]]; then
