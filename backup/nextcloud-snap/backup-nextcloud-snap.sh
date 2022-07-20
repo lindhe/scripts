@@ -43,8 +43,10 @@ else
 fi
 
 verbose "Exporting backup …"
+# Using `${NC_BACKUP_DIR:1}` removes the leading slash, making the path
+# relative. That, together with `-C /`, surpresses an warning print from tar
 # shellcheck disable=SC2016
-TAR_CMD='tar -cz -C / -f "${NC_BACKUP_DIR}/${BACKUP_NAME}.tar.gz" "${NC_BACKUP_PATH}"'
+TAR_CMD='tar -cz -C / -f "${NC_BACKUP_DIR:1}/${BACKUP_NAME}.tar.gz" "${NC_BACKUP_PATH}"'
 if [[ -n ${DEBUG+x} ]]; then
     echo "${TAR_CMD}"
 else
