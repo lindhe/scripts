@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-WARN_LARGE_SIZE="$((1024**4))"  # Size in KiB
+WARN_LARGE_SIZE="${MAX_ARCHIVE_SIZE:-$((1024**4))}"  # Size in KiB
 
 verbose() {
     if [[ -n ${VERBOSE+x} ]]; then
