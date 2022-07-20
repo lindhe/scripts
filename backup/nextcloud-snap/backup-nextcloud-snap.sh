@@ -11,6 +11,10 @@ verbose() {
     fi
 }
 
+debug() {
+    echo "${@}" 1>&2
+}
+
 fail() {
     echo "FAILURE: ${1:-exiting}" 1>&2
     exit "${2:-1}"
@@ -20,6 +24,12 @@ if [[ -z ${DEBUG+x} ]]; then
     if [ "$EUID" -ne 0 ]; then
         fail "Please run as root"
     fi
+fi
+
+if [[ -z "${1}" ]]; then
+    debug "USAGE:"
+    debug "  ${0} /path/to/storage/location"
+    exit
 fi
 
 readonly TARGET_BACKUP_DIR="${1/%\/}"  # Remove trailing /
