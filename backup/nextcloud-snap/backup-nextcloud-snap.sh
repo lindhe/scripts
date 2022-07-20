@@ -23,7 +23,7 @@ if [[ -z ${DEBUG+x} ]]; then
 fi
 
 readonly TARGET_BACKUP_DIR="${1/%\/}"  # Remove trailing /
-verbose "TARGET_BACKUP_DIR=${TARGET_BACKUP_DIR}"
+verbose "${TARGET_BACKUP_DIR@A}"
 
 verbose "Backup started …"
 if [[ -n ${DEBUG+x} ]]; then
@@ -34,19 +34,19 @@ else
     fi
     readonly NC_EXPORT="$(nextcloud.export "${MUTE}" | grep "Successfully exported")"
 fi
-verbose "NC_EXPORT=${NC_EXPORT}"
+verbose "${NC_EXPORT@A}"
 
 if [[ $? -eq 0 ]]; then
     verbose "Backup finished with exit code ${?}"
 
     readonly NC_BACKUP_PATH="$(echo "${NC_EXPORT}" | awk '{ print $(NF) }')"
-    verbose "NC_BACKUP_PATH=${NC_BACKUP_PATH}"
+    verbose "${NC_BACKUP_PATH@A}"
 
     readonly NC_BACKUP_DIR="$(dirname "${NC_BACKUP_PATH}")"
-    verbose "NC_BACKUP_DIR=${NC_BACKUP_DIR}"
+    verbose "${NC_BACKUP_DIR@A}"
 
     readonly BACKUP_NAME="$(basename "${NC_EXPORT}")"
-    verbose "BACKUP_NAME=${BACKUP_NAME}"
+    verbose "${BACKUP_NAME@A}"
 
 else
     fail "Backup finished with exit code ${?}" $?
