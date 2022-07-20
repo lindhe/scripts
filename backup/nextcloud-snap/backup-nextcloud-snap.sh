@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2034,2181
+# shellcheck disable=2181
 
 set -euo pipefail
 
-MAX_ARCHIVE_SIZE="${MAX_ARCHIVE_SIZE:-$((1024**4))}"  # Size in KiB
+readonly MAX_ARCHIVE_SIZE="${MAX_ARCHIVE_SIZE:-$((1024**4))}"  # Size in KiB
 
 verbose() {
     if [[ -n ${VERBOSE+x} ]]; then
@@ -22,22 +22,32 @@ if [[ -z ${DEBUG+x} ]]; then
     fi
 fi
 
-readonly TARGET_BACKUP_DIR=${1}
+readonly TARGET_BACKUP_DIR="${1/%\/}"  # Remove trailing /
 verbose "TARGET_BACKUP_DIR=${TARGET_BACKUP_DIR}"
 
 verbose "Backup started …"
 if [[ -n ${DEBUG+x} ]]; then
     readonly NC_EXPORT="Successfully exported /var/snap/nextcloud/common/backups/20220720-194312"
 else
-    readonly NC_EXPORT=$(nextcloud.export 2> /dev/null | grep "Successfully exported")
+    if [[ -z ${VERBOSE+x} ]]; then
+        MUTE="2> /dev/null"
+    fi
+    readonly NC_EXPORT="$(nextcloud.export "${MUTE}" | grep "Successfully exported")"
 fi
+verbose "NC_EXPORT=${NC_EXPORT}"
 
 if [[ $? -eq 0 ]]; then
     verbose "Backup finished with exit code ${?}"
-    verbose "NC_EXPORT=${NC_EXPORT}"
-    readonly NC_BACKUP_PATH=$(echo "${NC_EXPORT}" | awk '{ print $(NF) }')
+
+    readonly NC_BACKUP_PATH="$(echo "${NC_EXPORT}" | awk '{ print $(NF) }')"
+    verbose "NC_BACKUP_PATH=${NC_BACKUP_PATH}"
+
     readonly NC_BACKUP_DIR="$(dirname "${NC_BACKUP_PATH}")"
+    verbose "NC_BACKUP_DIR=${NC_BACKUP_DIR}"
+
     readonly BACKUP_NAME="$(basename "${NC_EXPORT}")"
+    verbose "BACKUP_NAME=${BACKUP_NAME}"
+
 else
     fail "Backup finished with exit code ${?}" $?
 fi
@@ -46,7 +56,7 @@ verbose "Exporting backup …"
 # Using `${NC_BACKUP_DIR:1}` removes the leading slash, making the path
 # relative. That, together with `-C /`, surpresses an warning print from tar
 # shellcheck disable=SC2016
-TAR_CMD='tar -cz -C / -f "${NC_BACKUP_DIR:1}/${BACKUP_NAME}.tar.gz" "${NC_BACKUP_PATH}"'
+TAR_CMD='tar -cz -f "${TARGET_BACKUP_DIR}/${BACKUP_NAME}.tar.gz" -C / "${NC_BACKUP_PATH:1}"'
 if [[ -n ${DEBUG+x} ]]; then
     echo "${TAR_CMD}"
 else
