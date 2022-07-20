@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
 # shellcheck disable=2181
 
+if [[ "${VERBOSE:-0}" == "4" ]]; then
+    set -x
+fi
+
 set -euo pipefail
 
 readonly MAX_ARCHIVE_SIZE="${MAX_ARCHIVE_SIZE:-$((1024**4))}"  # Size in KiB
-
-verbose() {
-    if [[ -n ${VERBOSE+x} ]]; then
-        echo "${@}"
-    fi
-}
 
 debug() {
     echo "${@}" 1>&2
@@ -33,9 +31,9 @@ if [[ -z "${1}" ]]; then
 fi
 
 readonly TARGET_BACKUP_DIR="${1/%\/}"  # Remove trailing /
-verbose "${TARGET_BACKUP_DIR@A}"
+if [[ "${VERBOSE}" == "2" ]]; then echo "${TARGET_BACKUP_DIR@A}"; fi
 
-verbose "Backup started …"
+if [[ -n ${VERBOSE+x} ]]; then echo "Backup started …"; fi
 if [[ -n ${DEBUG+x} ]]; then
     readonly NC_EXPORT="Successfully exported /var/snap/nextcloud/common/backups/20220720-194312"
 else
@@ -44,29 +42,29 @@ else
     fi
     readonly NC_EXPORT="$(nextcloud.export "${MUTE}" | grep "Successfully exported")"
 fi
-verbose "${NC_EXPORT@A}"
+if [[ "${VERBOSE}" == "2" ]]; then echo "${NC_EXPORT@A}"; fi
 
 if [[ $? -eq 0 ]]; then
-    verbose "Backup finished with exit code ${?}"
+    if [[ -n ${VERBOSE+x} ]]; then echo "Backup finished with exit code ${?}"; fi
 
     readonly NC_BACKUP_PATH="$(echo "${NC_EXPORT}" | awk '{ print $(NF) }')"
-    verbose "${NC_BACKUP_PATH@A}"
+    if [[ "${VERBOSE}" == "2" ]]; then echo "${NC_BACKUP_PATH@A}"; fi
 
     readonly NC_BACKUP_DIR="$(dirname "${NC_BACKUP_PATH}")"
-    verbose "${NC_BACKUP_DIR@A}"
+    if [[ "${VERBOSE}" == "2" ]]; then echo "${NC_BACKUP_DIR@A}"; fi
 
     readonly BACKUP_NAME="$(basename "${NC_EXPORT}")"
-    verbose "${BACKUP_NAME@A}"
+    if [[ "${VERBOSE}" == "2" ]]; then echo "${BACKUP_NAME@A}"; fi
 
 else
     fail "Backup finished with exit code ${?}" $?
 fi
 
-verbose "Exporting backup …"
+if [[ -n ${VERBOSE+x} ]]; then echo "Exporting backup …"; fi
 # Using `${NC_BACKUP_DIR:1}` removes the leading slash, making the path
 # relative. That, together with `-C /`, surpresses an warning print from tar
 # shellcheck disable=SC2016
-TAR_CMD='tar -cz -f "${TARGET_BACKUP_DIR}/${BACKUP_NAME}.tar.gz" -C / "${NC_BACKUP_PATH:1}"'
+TAR_CMD='tar "${VERBOSE+-v}" -cz -f "${TARGET_BACKUP_DIR}/${BACKUP_NAME}.tar.gz" -C / "${NC_BACKUP_PATH:1}"'
 if [[ -n ${DEBUG+x} ]]; then
     echo "${TAR_CMD}"
 else
@@ -76,17 +74,17 @@ fi
 if [[ ! $? -eq 0 ]]; then
     fail "Export failed with exit code ${?}" $?
 fi
-verbose "Export complete!"
+if [[ -n ${VERBOSE+x} ]]; then echo "Export complete!"; fi
 
-verbose "Cleaning up directory …"
+if [[ -n ${VERBOSE+x} ]]; then echo "Cleaning up directory …"; fi
 # shellcheck disable=SC2016
-CLEANUP_CMD='rm -rf "${NC_BACKUP_PATH}"'
+CLEANUP_CMD='rm ${VERBOSE+-v} -rf "${NC_BACKUP_PATH}"'
 if [[ -n ${DEBUG+x} ]]; then
     echo "${CLEANUP_CMD}"
 else
     eval "${CLEANUP_CMD}"
 fi
-verbose "Clean-up complete!"
+if [[ -n ${VERBOSE+x} ]]; then echo "Clean-up complete!"; fi
 
 if [[ -z ${DEBUG+x} ]]; then
     if [[ $(du -k "${TARGET_BACKUP_DIR}") -ge "${MAX_ARCHIVE_SIZE}" ]]; then
