@@ -41,7 +41,7 @@ else
         MUTE="2> /dev/null"
         readonly MUTE
     fi
-    NC_EXPORT="$(nextcloud.export "${MUTE:-}" | grep "Successfully exported")"
+    NC_EXPORT="$(nextcloud.export "${MUTE:-}")"
     readonly NC_EXPORT
 fi
 if [[ "${VERBOSE}" == "2" ]]; then echo "${NC_EXPORT@A}"; fi
@@ -49,7 +49,12 @@ if [[ "${VERBOSE}" == "2" ]]; then echo "${NC_EXPORT@A}"; fi
 if [[ $? -eq 0 ]]; then
     if [[ -n ${VERBOSE+x} ]]; then echo "Backup finished with exit code ${?}"; fi
 
-    NC_BACKUP_PATH="$(echo "${NC_EXPORT}" | awk '{ print $(NF) }')"
+    SUCCESS_STRING=$(echo "${NC_EXPORT}" | grep "Successfully exported") \
+        || fail "Grep unexpectedly could not find substring despite successful export!"
+    readonly SUCCESS_STRING
+    if [[ "${VERBOSE}" == "2" ]]; then echo "${SUCCESS_STRING@A}"; fi
+
+    NC_BACKUP_PATH="$(echo "${SUCCESS_STRING}" | awk '{ print $(NF) }')"
     readonly NC_BACKUP_PATH
     if [[ "${VERBOSE}" == "2" ]]; then echo "${NC_BACKUP_PATH@A}"; fi
 
@@ -57,7 +62,7 @@ if [[ $? -eq 0 ]]; then
     readonly NC_BACKUP_DIR
     if [[ "${VERBOSE}" == "2" ]]; then echo "${NC_BACKUP_DIR@A}"; fi
 
-    BACKUP_NAME="$(basename "${NC_EXPORT}")"
+    BACKUP_NAME="$(basename "${SUCCESS_STRING}")"
     readonly BACKUP_NAME
     if [[ "${VERBOSE}" == "2" ]]; then echo "${BACKUP_NAME@A}"; fi
 
