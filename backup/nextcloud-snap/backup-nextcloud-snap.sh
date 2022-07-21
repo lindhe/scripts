@@ -24,7 +24,7 @@ if [[ -z ${DEBUG+x} ]]; then
     fi
 fi
 
-if [[ -z "${1}" ]]; then
+if [[ -z "${1:-}" ]]; then
     debug "USAGE:"
     debug "  ${0} /path/to/storage/location"
     exit
