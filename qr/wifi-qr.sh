@@ -11,10 +11,10 @@ fail() {
     exit "${2:-1}"
 }
 
-if [[ $# -ne 2 ]]; then
+if [[ $# -lt 2 ]]; then
     debug ""
     debug "USAGE:"
-    debug "    ${0} SSID PASSWORD"
+    debug "    ${0} SSID PASSWORD [file.png]"
     debug ""
     exit 0
 fi
@@ -23,4 +23,11 @@ readonly SSID="${1}"
 readonly PASSWORD="${2//;/\\;}"  # Sanitize the password from bad characters
 readonly ENC_TYPE=WPA
 
-echo -n "WIFI:S:${SSID};T:${ENC_TYPE};P:${PASSWORD};;" | qrencode -t utf8 -o -
+
+if [[ $# -eq 3 ]]; then
+    readonly QR_CMD="qrencode --output=${3}"
+else
+    readonly QR_CMD='qrencode -t utf8 -o -'
+fi
+
+echo -n "WIFI:S:${SSID};T:${ENC_TYPE};P:${PASSWORD};;" | ${QR_CMD}
