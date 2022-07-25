@@ -12,11 +12,20 @@
 
 set -euo pipefail
 
+if [[ $# -eq 0 ]]; then
+    # no args => stdin
+    readarray inputarray
+else
+    inputarray=("${@}")
+fi
+readonly inputarray
+
+
 logger "Message from wall:
-${*}
+${inputarray[*]}
 "
 
-echo -e "Subject: Message from wall\n\nThis was captured by wall:\n${*}" \
+echo -e "Subject: Message from wall\n\nThis was captured by wall:\n${inputarray[*]}" \
     | sendmail root
 
-wall.orig "${@}"
+wall.orig "${inputarray[*]}"
