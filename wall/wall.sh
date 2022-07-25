@@ -11,10 +11,10 @@
 # Author: Andreas Lindhé
 
 logger "Message from wall:
-${@}
+${*}
 "
 
-echo -e "Subject: Message from wall\n\nThis was captured by wall:\n${@}" \
+echo -e "Subject: Message from wall\n\nThis was captured by wall:\n${*}" \
     | sendmail root
 
 wall.orig "${@}"
