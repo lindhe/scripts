@@ -1,0 +1,8 @@
+.PHONY: test install
+
+test:
+	shellcheck ./foo.sh
+
+install: test
+	install ./foo.sh /usr/local/bin/foo
+
