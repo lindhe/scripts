@@ -28,4 +28,4 @@ ${inputarray[*]}
 echo -e "Subject: Message from wall\n\nThis was captured by wall:\n${inputarray[*]}" \
     | sendmail root
 
-wall.orig "${inputarray[*]}"
+/usr/bin/wall "${inputarray[*]}"
