@@ -10,6 +10,8 @@
 # License: MIT
 # Author: Andreas Lindhé
 
+set -euo pipefail
+
 logger "Message from wall:
 ${*}
 "
