@@ -21,6 +21,6 @@ fi
 
 readonly SSID="${1}"
 readonly PASSWORD="${2//;/\\;}"  # Sanitize the password from bad characters
-readonly ENC_TYPE=WPA2
+readonly ENC_TYPE=WPA
 
 echo -n "WIFI:S:${SSID};T:${ENC_TYPE};P:${PASSWORD};;" | qrencode -t utf8 -o -
