@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2015
+
 # Checks for authorized Wi-Fi SSID or connected Ethernet before performing
 # backup.
 
@@ -42,7 +44,7 @@ LIST_OF_ETH_IF=(
     eth1
 )
 
-WLAN_IS_METERED="$(nmcli -g connection.metered connection show ${WLAN_SSID})"
+WLAN_IS_METERED="$(nmcli -g connection.metered connection show "${WLAN_SSID}")"
 
 # print to both stdout and log
 logprint () {
@@ -66,8 +68,8 @@ CONNECTED_VIA_ETHERNET=false
 # Note that this check if an ethernet dev is a default route, but WLAN devices
 # might also be default routes (since there might be many). Not sure how to work
 # around this.
-for DEV in ${LIST_OF_ETH_IF[@]}; do
-    for ROUTE_DEV in ${DEFAULT_ROUTE_DEV[@]}; do
+for DEV in "${LIST_OF_ETH_IF[@]}"; do
+    for ROUTE_DEV in "${DEFAULT_ROUTE_DEV[@]}"; do
         if [[ "${DEV}" = "${ROUTE_DEV}" ]]; then
             CONNECTED_VIA_ETHERNET=true
         fi
@@ -75,7 +77,7 @@ for DEV in ${LIST_OF_ETH_IF[@]}; do
 done
 
 # We'll always backup if charging or just making a small backup
-if [ ! -z "$CHARGING" ] || [ ! -z "${MAX_SIZE}" ]; then
+if [ -n "$CHARGING" ] || [ -n "${MAX_SIZE}" ]; then
     # Ethernet connection is always OK for backup
     if [[ "${CONNECTED_VIA_ETHERNET}" = "true" ]]; then
         logprint "Performing backup over Ethernet (${DEFAULT_ROUTE_DEV})";
@@ -93,12 +95,12 @@ fi
 
 if $RUN; then
     logprint "Backup of $HOST started at $(date +'%F_%T')";
-    if [ ! -z "${MAX_SIZE}" ]; then
+    if [ -n "${MAX_SIZE}" ]; then
         logprint "Only backing up files smaller than ${1}"
     fi
     rsync -aAX --partial --delete --delete-excluded / \
         --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt \
-        ${MAX_SIZE} \
+        "${MAX_SIZE}" \
         backup:/ \
         && logprint "Backup of $HOST finished $(date +'%F_%T')" \
         || logprint_err "Backup of $HOST failed $(date +'%F_%T')"
