@@ -1,13 +1,28 @@
 #!/bin/bash
-#
-# Create a cronjob:
-# @daily date '+%s' > /etc/backup/alive
-#
-# Now check if date is less than one week away:
 
-t=$(date '+%s')
-diff=$(( $t - $(cat /etc/backup/alive) ))
+# Checks the age of a timestamp on file
 
-if [ $diff -gt 604800 ]; then
-    logger -p syslog.err "No backup was made during the last week!"
+set -euo pipefail
+
+if [[ "${VERBOSE:-0}" == 2 ]]; then
+  set -x
+fi
+
+readonly ALIVE_FILE="${1:-/etc/backup/alive}"
+readonly ERROR_TEXT="No backup was made during the last week!"
+
+readonly MAX_AGE=604800
+readonly NOW=$(date '+%s')
+readonly TIME_DELTA=$(( NOW - $(cat "${ALIVE_FILE}") ))
+
+if [[ -n ${VERBOSE+x} ]]; then
+  echo "${ALIVE_FILE@A}"
+  echo "${MAX_AGE@A}"
+  echo "${NOW@A}"
+  echo "${TIME_DELTA@A}"
+fi
+
+if [[ ${TIME_DELTA} -gt ${MAX_AGE} ]]; then
+  echo "${ERROR_TEXT}" 1>&2
+  logger -p syslog.err "${ERROR_TEXT}"
 fi
