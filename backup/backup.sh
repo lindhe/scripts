@@ -2,7 +2,7 @@
 # Checks for authorized Wi-Fi SSID or connected Ethernet before performing
 # backup.
 
-# Copyright 2017 Andreas Lindhé
+# Copyright 2022 Andreas Lindhé
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
