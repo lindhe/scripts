@@ -124,7 +124,7 @@ fi
 if $RUN; then
     logprint "Backup of $HOST started at $(date +'%F_%T')";
     if [ -n "${MAX_SIZE}" ]; then
-        logprint "Only backing up files smaller than ${1}"
+        logprint "Only backing up files no larger than ${MAX_SIZE}"
     fi
     if ${RSYNC_CMD}; then
         logprint "Backup of $HOST finished $(date +'%F_%T')" \
