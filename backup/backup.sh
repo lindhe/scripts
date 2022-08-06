@@ -12,12 +12,8 @@ fi
 
 ##############################     constants     ##############################
 
-# The first argument given, $1, will be treated as the --max-size
-# If $1 is empty, --max-size is not used.
 readonly MAX_SIZE="${1:+ --max-size ${1}}"
-
 readonly BACKUP_SCRIPT_DIR='/etc/backup'
-
 readonly HOST=$(hostname)
 readonly CHARGING=$(acpi --ac-adapter | grep "on-line")
 readonly WLAN_SSID=$(iwgetid --raw);
@@ -37,11 +33,9 @@ fi
 readonly BACKUP_TARGET_DIR
 
 readonly WLAN_IS_METERED="$(nmcli -g connection.metered connection show "${WLAN_SSID}")"
-
 readonly LOG_PREFIX='Backup:'
 
 readonly RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt"
-
 if [[ -n ${DEBUG+x} ]]; then
   RSYNC_CMD="echo rsync ${RSYNC_FLAGS}"
 else
@@ -58,7 +52,7 @@ logprint () {
     fi
     logger "${LOG_PREFIX} ${1}"
     if (command -v notify-send &> /dev/null); then
-      notify-send --urgency=low "${LOG_PREFIX} ${1}\n\nPlease check journalctl for more info."
+        notify-send --urgency=low "${LOG_PREFIX} ${1}\n\nPlease check journalctl for more info."
     fi
 }
 
@@ -67,7 +61,7 @@ logprint_err () {
     echo "${LOG_PREFIX} ${1}" 1>&2
     logger -p syslog.err "${LOG_PREFIX} ${1}"
     if (command -v notify-send &> /dev/null); then
-      notify-send --urgency=critical "${LOG_PREFIX} ${1}\n\nPlease check journalctl for more info."
+        notify-send --urgency=critical "${LOG_PREFIX} ${1}\n\nPlease check journalctl for more info."
     fi
 }
 #}}}
@@ -98,12 +92,12 @@ if [[ -z ${LOCAL_BACKUP+x} ]]; then  # Check conditions for remote backup
 
     # We'll always backup if charging or just making a small backup
     if [ -n "$CHARGING" ] || [ -n "${MAX_SIZE}" ]; then
-        # Ethernet connection is always OK for backup
         if [[ "${CONNECTED_VIA_ETHERNET}" = "true" ]]; then
+            # Ethernet connection is always OK for backup
             logprint "Performing backup over Ethernet (${DEFAULT_ROUTE_DEV})";
             RUN=true;
-        # WLAN is OK if it's not metered
         elif [[ "${WLAN_IS_METERED}" == "no" ]]; then
+            # WLAN is OK if it's not metered
             logprint "Performing backup over Wi-fi: $WLAN_SSID";
             RUN=true;
         else
@@ -112,6 +106,7 @@ if [[ -z ${LOCAL_BACKUP+x} ]]; then  # Check conditions for remote backup
     else
         logprint_err "Not charging. Prohibiting backup."
     fi
+
 fi
 
 if $RUN; then
@@ -119,13 +114,11 @@ if $RUN; then
     if [ -n "${MAX_SIZE}" ]; then
         logprint "Only backing up files smaller than ${1}"
     fi
-
     if ${RSYNC_CMD} "${MAX_SIZE}" "${BACKUP_SOURCE_DIR}" "${BACKUP_TARGET_DIR}"; then
         logprint "Backup of $HOST finished $(date +'%F_%T')" \
     else
         logprint_err "Backup of $HOST failed $(date +'%F_%T')"
     fi
-
 else
     logprint_err "Backup of $HOST failed $(date +'%F_%T')";
     exit 1;
