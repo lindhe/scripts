@@ -56,8 +56,10 @@ logprint () {
 logprint_err () {
     echo "${1}" 1>&2
     logger -p syslog.err "${1}"
-    notify-send --urgency=critical 'Backup error' \
-        "${1}\n\nPlease check journalctl for more info."
+    if (command -v notify-send &> /dev/null); then
+      notify-send --urgency=critical 'Backup error' \
+          "${1}\n\nPlease check journalctl for more info."
+    fi
 }
 
 if [[ -n ${DEBUG+x} ]]; then
