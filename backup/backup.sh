@@ -42,21 +42,25 @@ readonly BACKUP_TARGET_DIR
 
 readonly WLAN_IS_METERED="$(nmcli -g connection.metered connection show "${WLAN_SSID}")"
 
+readonly LOG_PREFIX='Backup:'
+
 # print to both stdout and log
 logprint () {
     if [[ -n ${VERBOSE+x} ]]; then
-        echo "${1}"
+        echo "${LOG_PREFIX} ${1}"
     fi
-    logger "${1}"
+    logger "${LOG_PREFIX} ${1}"
+    if (command -v notify-send &> /dev/null); then
+      notify-send --urgency=low "${LOG_PREFIX} ${1}\n\nPlease check journalctl for more info."
+    fi
 }
 
 # print to both stderr and log
 logprint_err () {
-    echo "${1}" 1>&2
-    logger -p syslog.err "${1}"
+    echo "${LOG_PREFIX} ${1}" 1>&2
+    logger -p syslog.err "${LOG_PREFIX} ${1}"
     if (command -v notify-send &> /dev/null); then
-      notify-send --urgency=critical 'Backup error' \
-          "${1}\n\nPlease check journalctl for more info."
+      notify-send --urgency=critical "${LOG_PREFIX} ${1}\n\nPlease check journalctl for more info."
     fi
 }
 
