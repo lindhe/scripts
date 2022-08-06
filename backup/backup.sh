@@ -13,17 +13,17 @@ fi
 
 # The first argument given, $1, will be treated as the --max-size
 # If $1 is empty, --max-size is not used.
-MAX_SIZE="${1:+ --max-size ${1}}"
+readonly MAX_SIZE="${1:+ --max-size ${1}}"
 
-BACKUP_SCRIPT_DIR='/etc/backup'
+readonly BACKUP_SCRIPT_DIR='/etc/backup'
 
 # Update alive file
 (umask 033; date '+%s' > ${BACKUP_SCRIPT_DIR}/alive)
 
-HOST=$(hostname)
-CHARGING=$(acpi --ac-adapter | grep "on-line")
-WLAN_SSID=$(iwgetid --raw);
-LIST_OF_ETH_IF=(
+readonly HOST=$(hostname)
+readonly CHARGING=$(acpi --ac-adapter | grep "on-line")
+readonly WLAN_SSID=$(iwgetid --raw);
+readonly LIST_OF_ETH_IF=(
     eth0
     eth1
 )
@@ -38,7 +38,7 @@ else
 fi
 readonly BACKUP_TARGET_DIR
 
-WLAN_IS_METERED="$(nmcli -g connection.metered connection show "${WLAN_SSID}")"
+readonly WLAN_IS_METERED="$(nmcli -g connection.metered connection show "${WLAN_SSID}")"
 
 # print to both stdout and log
 logprint () {
