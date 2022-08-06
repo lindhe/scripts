@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# vim: set ts=4 sw=4:
 
 # Checks for authorized Wi-Fi SSID or connected Ethernet before performing
 # backup.
