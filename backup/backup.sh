@@ -6,6 +6,11 @@
 
 set -euo pipefail
 
+if [[ "${VERBOSE:-0}" == 2 ]]; then
+  set -x
+fi
+
+
 # The first argument given, $1, will be treated as the --max-size
 # If $1 is empty, --max-size is not used.
 MAX_SIZE="${1:+ --max-size ${1}}"
@@ -28,7 +33,9 @@ WLAN_IS_METERED="$(nmcli -g connection.metered connection show "${WLAN_SSID}")"
 
 # print to both stdout and log
 logprint () {
-    echo "${1}"
+    if [[ -n ${VERBOSE+x} ]]; then
+        echo "${1}"
+    fi
     logger "${1}"
 }
 
