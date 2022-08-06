@@ -75,10 +75,8 @@ if [[ -n ${RUN_LOCALLY+x} ]]; then
 
   ${RSYNC_CMD} "${RSYNC_FLAGS}" \
       / /storage/backups/server/bserver/ \
-      && (echo "Backup finished $(date +'%F_%T')"; \
-          logger "Backup finished $(date +'%F_%T')") \
-      || (echo "Backup failed $(date +'%F_%T')"; \
-          logger -p syslog.err "Backup failed $(date +'%F_%T')")
+      && logprint "Backup finished $(date +'%F_%T')" \
+      || logprint_err "Backup failed $(date +'%F_%T')"
 
 else
   # Check which device is used for default route
