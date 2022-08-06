@@ -73,13 +73,13 @@ logprint_err () {
 }
 #}}}
 
-#################################     main     #################################
-
-# Update alive file
+##########################     Update alive file     ##########################{{{
 set +e
 (umask 033; date '+%s' > ${BACKUP_SCRIPT_DIR}/alive)
 set -e
+#}}}
 
+#########################     Check preconditions     #########################{{{
 if [[ -z ${LOCAL_BACKUP+x} ]]; then  # Check conditions for remote backup
     # Check which device is used for default route
     DEFAULT_ROUTE_DEV=$(ip route show default | cut -d ' ' -f 5)
@@ -115,7 +115,9 @@ if [[ -z ${LOCAL_BACKUP+x} ]]; then  # Check conditions for remote backup
     fi
 
 fi
+#}}}
 
+##############################     Run backup     ##############################{{{
 if $RUN; then
     logprint "Backup of $HOST started at $(date +'%F_%T')";
     if [ -n "${MAX_SIZE}" ]; then
@@ -130,3 +132,5 @@ else
     logprint_err "Backup of $HOST failed $(date +'%F_%T')";
     exit 1;
 fi
+#}}}
+
