@@ -18,7 +18,9 @@ readonly MAX_SIZE="${1:+ --max-size ${1}}"
 readonly BACKUP_SCRIPT_DIR='/etc/backup'
 
 # Update alive file
+set +e
 (umask 033; date '+%s' > ${BACKUP_SCRIPT_DIR}/alive)
+set -e
 
 readonly HOST=$(hostname)
 readonly CHARGING=$(acpi --ac-adapter | grep "on-line")
