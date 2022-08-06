@@ -69,63 +69,54 @@ readonly RSYNC_CMD
 
 readonly RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt"
 
-if [[ -n ${LOCAL_BACKUP+x} ]]; then
+if [[ -z ${LOCAL_BACKUP+x} ]]; then  # Check conditions for remote backup
+    # Check which device is used for default route
+    DEFAULT_ROUTE_DEV=$(ip route show default | cut -d ' ' -f 5)
 
-  if ${RSYNC_CMD} "${RSYNC_FLAGS}${MAX_SIZE}" "${BACKUP_SOURCE_DIR}" "${BACKUP_TARGET_DIR}"; then
-    logprint "Backup finished $(date +'%F_%T')" \
-  else
-    logprint_err "Backup failed $(date +'%F_%T')"
-  fi
+    # Determine network connection type
+    CONNECTED_VIA_ETHERNET=false
+    # Note that this check if an ethernet dev is a default route, but WLAN devices
+    # might also be default routes (since there might be many). Not sure how to work
+    # around this.
+    for DEV in "${LIST_OF_ETH_IF[@]}"; do
+        for ROUTE_DEV in "${DEFAULT_ROUTE_DEV[@]}"; do
+            if [[ "${DEV}" = "${ROUTE_DEV}" ]]; then
+                CONNECTED_VIA_ETHERNET=true
+            fi
+        done
+    done
+
+    # We'll always backup if charging or just making a small backup
+    if [ -n "$CHARGING" ] || [ -n "${MAX_SIZE}" ]; then
+        # Ethernet connection is always OK for backup
+        if [[ "${CONNECTED_VIA_ETHERNET}" = "true" ]]; then
+            logprint "Performing backup over Ethernet (${DEFAULT_ROUTE_DEV})";
+            RUN=true;
+        # WLAN is OK if it's not metered
+        elif [[ "${WLAN_IS_METERED}" == "no" ]]; then
+            logprint "Performing backup over Wi-fi: $WLAN_SSID";
+            RUN=true;
+        else
+            logprint_err "Prohibited backup since ${WLAN_SSID} is metered.";
+        fi
+    else
+        logprint_err "Not charging. Prohibiting backup."
+    fi
+fi
+
+if $RUN; then
+    logprint "Backup of $HOST started at $(date +'%F_%T')";
+    if [ -n "${MAX_SIZE}" ]; then
+        logprint "Only backing up files smaller than ${1}"
+    fi
+
+    if ${RSYNC_CMD} "${RSYNC_FLAGS}${MAX_SIZE}" "${BACKUP_SOURCE_DIR}" "${BACKUP_TARGET_DIR}"; then
+        logprint "Backup of $HOST finished $(date +'%F_%T')" \
+    else
+        logprint_err "Backup of $HOST failed $(date +'%F_%T')"
+    fi
 
 else
-  # Check which device is used for default route
-  DEFAULT_ROUTE_DEV=$(ip route show default | cut -d ' ' -f 5)
-
-  # Determine network connection type
-  CONNECTED_VIA_ETHERNET=false
-  # Note that this check if an ethernet dev is a default route, but WLAN devices
-  # might also be default routes (since there might be many). Not sure how to work
-  # around this.
-  for DEV in "${LIST_OF_ETH_IF[@]}"; do
-      for ROUTE_DEV in "${DEFAULT_ROUTE_DEV[@]}"; do
-          if [[ "${DEV}" = "${ROUTE_DEV}" ]]; then
-              CONNECTED_VIA_ETHERNET=true
-          fi
-      done
-  done
-
-  # We'll always backup if charging or just making a small backup
-  if [ -n "$CHARGING" ] || [ -n "${MAX_SIZE}" ]; then
-      # Ethernet connection is always OK for backup
-      if [[ "${CONNECTED_VIA_ETHERNET}" = "true" ]]; then
-          logprint "Performing backup over Ethernet (${DEFAULT_ROUTE_DEV})";
-          RUN=true;
-      # WLAN is OK if it's not metered
-      elif [[ "${WLAN_IS_METERED}" == "no" ]]; then
-          logprint "Performing backup over Wi-fi: $WLAN_SSID";
-          RUN=true;
-      else
-          logprint_err "Prohibited backup since ${WLAN_SSID} is metered.";
-      fi
-  else
-      logprint_err "Not charging. Prohibiting backup."
-  fi
-
-  if $RUN; then
-      logprint "Backup of $HOST started at $(date +'%F_%T')";
-      if [ -n "${MAX_SIZE}" ]; then
-          logprint "Only backing up files smaller than ${1}"
-      fi
-
-      if ${RSYNC_CMD} "${RSYNC_FLAGS}${MAX_SIZE}" "${BACKUP_SOURCE_DIR}" "${BACKUP_TARGET_DIR}"; then
-          logprint "Backup of $HOST finished $(date +'%F_%T')" \
-      else
-          logprint_err "Backup of $HOST failed $(date +'%F_%T')"
-      fi
-
-  else
-      logprint_err "Backup of $HOST failed $(date +'%F_%T')";
-      exit 1;
-  fi
-
+    logprint_err "Backup of $HOST failed $(date +'%F_%T')";
+    exit 1;
 fi
