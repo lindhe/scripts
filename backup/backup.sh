@@ -10,6 +10,7 @@ if [[ "${VERBOSE:-0}" == 2 ]]; then
   set -x
 fi
 
+##############################     constants     ##############################
 
 # The first argument given, $1, will be treated as the --max-size
 # If $1 is empty, --max-size is not used.
@@ -48,6 +49,8 @@ readonly RSYNC_CMD
 
 readonly RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt"
 
+##############################     functions     ##############################
+
 # print to both stdout and log
 logprint () {
     if [[ -n ${VERBOSE+x} ]]; then
@@ -67,6 +70,8 @@ logprint_err () {
       notify-send --urgency=critical "${LOG_PREFIX} ${1}\n\nPlease check journalctl for more info."
     fi
 }
+
+#################################     main     #################################
 
 # Update alive file
 set +e
