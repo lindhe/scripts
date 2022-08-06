@@ -58,7 +58,7 @@ readonly RSYNC_CMD
 
 readonly RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt"
 
-if [[ -n ${RUN_LOCALLY+x} ]]; then
+if [[ -n ${LOCAL_BACKUP+x} ]]; then
 
   if ${RSYNC_CMD} "${RSYNC_FLAGS}" / /storage/backups/server/bserver/; then
     logprint "Backup finished $(date +'%F_%T')" \
