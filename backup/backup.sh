@@ -17,11 +17,6 @@ readonly MAX_SIZE="${1:+ --max-size ${1}}"
 
 readonly BACKUP_SCRIPT_DIR='/etc/backup'
 
-# Update alive file
-set +e
-(umask 033; date '+%s' > ${BACKUP_SCRIPT_DIR}/alive)
-set -e
-
 readonly HOST=$(hostname)
 readonly CHARGING=$(acpi --ac-adapter | grep "on-line")
 readonly WLAN_SSID=$(iwgetid --raw);
@@ -72,6 +67,11 @@ logprint_err () {
       notify-send --urgency=critical "${LOG_PREFIX} ${1}\n\nPlease check journalctl for more info."
     fi
 }
+
+# Update alive file
+set +e
+(umask 033; date '+%s' > ${BACKUP_SCRIPT_DIR}/alive)
+set -e
 
 if [[ -z ${LOCAL_BACKUP+x} ]]; then  # Check conditions for remote backup
     # Check which device is used for default route
