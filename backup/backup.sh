@@ -14,7 +14,11 @@ fi
 
 ##############################     constants     ##############################{{{
 
-readonly MAX_SIZE="${1:+ --max-size ${1}}"
+# Args
+readonly BACKUP_TARGET_DIR="${1}"
+readonly BACKUP_SOURCE_DIR="${2:-/}"
+readonly MAX_SIZE="${3:+ --max-size ${3}}"
+
 readonly BACKUP_SCRIPT_DIR='/etc/backup'
 readonly HOST=$(hostname)
 readonly CHARGING=$(acpi --ac-adapter | grep "on-line")
@@ -23,16 +27,12 @@ readonly LIST_OF_ETH_IF=(
     eth0
     eth1
 )
-readonly BACKUP_SOURCE_DIR='/'
 
 if [[ -n ${LOCAL_BACKUP+x} ]]; then
-    BACKUP_TARGET_DIR='/storage/backups/server/bserver/'
     RUN=true
 else
-    BACKUP_TARGET_DIR='backup:/'
     RUN=false
 fi
-readonly BACKUP_TARGET_DIR
 
 readonly WLAN_IS_METERED="$(nmcli -g connection.metered connection show "${WLAN_SSID}")"
 readonly LOG_PREFIX='Backup:'
