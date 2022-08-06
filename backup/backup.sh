@@ -21,7 +21,6 @@ BACKUP_SCRIPT_DIR='/etc/backup'
 (umask 033; date '+%s' > ${BACKUP_SCRIPT_DIR}/alive)
 
 HOST=$(hostname)
-RUN=false;
 CHARGING=$(acpi --ac-adapter | grep "on-line")
 WLAN_SSID=$(iwgetid --raw);
 LIST_OF_ETH_IF=(
@@ -32,8 +31,10 @@ readonly BACKUP_SOURCE_DIR='/'
 
 if [[ -n ${LOCAL_BACKUP+x} ]]; then
     BACKUP_TARGET_DIR='/storage/backups/server/bserver/'
+    RUN=true
 else
     BACKUP_TARGET_DIR='backup:/'
+    RUN=false
 fi
 readonly BACKUP_TARGET_DIR
 
