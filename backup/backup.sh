@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# vim: set ts=4 sw=4:
+# vim: set ts=4 sw=4 fdm=marker:
 
 # Checks for authorized Wi-Fi SSID or connected Ethernet before performing
 # backup.
@@ -49,7 +49,7 @@ readonly RSYNC_CMD
 
 readonly RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt"
 
-##############################     functions     ##############################
+##############################     functions     ##############################{{{
 
 # print to both stdout and log
 logprint () {
@@ -70,6 +70,7 @@ logprint_err () {
       notify-send --urgency=critical "${LOG_PREFIX} ${1}\n\nPlease check journalctl for more info."
     fi
 }
+#}}}
 
 #################################     main     #################################
 
