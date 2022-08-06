@@ -7,6 +7,17 @@
 ###############################     preamble     ###############################{{{
 set -euo pipefail
 
+if [[ "${#}" -lt 2 ]]; then
+    echo "USAGE:"
+    echo "  ${0} SOURCE DESTINATION [MAX_SIZE]"
+    echo ""
+    echo "EXAMPLES:"
+    echo "  ${0} / foo@server:/ 1M"
+    echo "  ${0} /home/foo /backups/users/foo"
+    echo ""
+    exit
+fi
+
 if [[ "${VERBOSE:-0}" == 2 ]]; then
   set -x
 fi
