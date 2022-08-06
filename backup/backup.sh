@@ -28,6 +28,14 @@ LIST_OF_ETH_IF=(
     eth0
     eth1
 )
+readonly BACKUP_SOURCE_DIR='/'
+
+if [[ -n ${LOCAL_BACKUP+x} ]]; then
+    BACKUP_TARGET_DIR='/storage/backups/server/bserver/'
+else
+    BACKUP_TARGET_DIR='backup:/'
+fi
+readonly BACKUP_TARGET_DIR
 
 WLAN_IS_METERED="$(nmcli -g connection.metered connection show "${WLAN_SSID}")"
 
@@ -60,7 +68,7 @@ readonly RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=
 
 if [[ -n ${LOCAL_BACKUP+x} ]]; then
 
-  if ${RSYNC_CMD} "${RSYNC_FLAGS}" / /storage/backups/server/bserver/; then
+  if ${RSYNC_CMD} "${RSYNC_FLAGS}" "${BACKUP_SOURCE_DIR}" "${BACKUP_TARGET_DIR}"; then
     logprint "Backup finished $(date +'%F_%T')" \
   else
     logprint_err "Backup failed $(date +'%F_%T')"
@@ -106,7 +114,7 @@ else
           logprint "Only backing up files smaller than ${1}"
       fi
 
-      if ${RSYNC_CMD} "${RSYNC_FLAGS}${MAX_SIZE}" / backup:/; then
+      if ${RSYNC_CMD} "${RSYNC_FLAGS}${MAX_SIZE}" "${BACKUP_SOURCE_DIR}" "${BACKUP_TARGET_DIR}"; then
           logprint "Backup of $HOST finished $(date +'%F_%T')" \
       else
           logprint_err "Backup of $HOST failed $(date +'%F_%T')"
