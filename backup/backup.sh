@@ -4,13 +4,15 @@
 # Checks for authorized Wi-Fi SSID or connected Ethernet before performing
 # backup.
 
+###############################     preamble     ###############################{{{
 set -euo pipefail
 
 if [[ "${VERBOSE:-0}" == 2 ]]; then
   set -x
 fi
+#}}}
 
-##############################     constants     ##############################
+##############################     constants     ##############################{{{
 
 readonly MAX_SIZE="${1:+ --max-size ${1}}"
 readonly BACKUP_SCRIPT_DIR='/etc/backup'
@@ -49,6 +51,7 @@ else
   RSYNC_CMD="rsync ${RSYNC_FLAGS} ${RSYNC_ARGS[*]}"
 fi
 readonly RSYNC_CMD
+#}}}
 
 ##############################     functions     ##############################{{{
 
