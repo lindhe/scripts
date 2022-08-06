@@ -20,7 +20,6 @@ readonly BACKUP_SOURCE_DIR="${2:-/}"
 readonly MAX_SIZE="${3:+ --max-size ${3}}"
 
 readonly BACKUP_SCRIPT_DIR='/etc/backup'
-readonly HOST=$(hostname)
 readonly CHARGING=$(acpi --ac-adapter | grep "on-line")
 readonly WLAN_SSID=$(iwgetid --raw);
 readonly LIST_OF_ETH_IF=(
@@ -43,14 +42,20 @@ readonly RSYNC_ARGS=(
     "${BACKUP_SOURCE_DIR}"
     "${BACKUP_TARGET_DIR}"
 )
+
 if [[ -n ${DEBUG_FAIL+x} ]]; then
   RSYNC_CMD="false"
+  HOST="DEBUG $(hostname)"
 elif [[ -n ${DEBUG+x} ]]; then
   RSYNC_CMD="echo rsync ${RSYNC_FLAGS} ${RSYNC_ARGS[*]}"
+  HOST="DEBUG $(hostname)"
 else
   RSYNC_CMD="rsync ${RSYNC_FLAGS} ${RSYNC_ARGS[*]}"
+  HOST="$(hostname)"
 fi
+readonly HOST
 readonly RSYNC_CMD
+
 #}}}
 
 ##############################     functions     ##############################{{{
@@ -121,19 +126,20 @@ fi
 #}}}
 
 ##############################     Run backup     ##############################{{{
-if $RUN; then
-    logprint "Backup of $HOST started at $(date +'%F_%T')";
-    if [ -n "${MAX_SIZE}" ]; then
+if ${RUN}; then
+    logprint "Backup of ${HOST} started at $(date +'%F_%T')";
+    if [ -n "${MAX_SIZE+x}" ]; then
         logprint "Only backing up files no larger than ${MAX_SIZE}"
     fi
     if ${RSYNC_CMD}; then
-        logprint "Backup of $HOST finished $(date +'%F_%T')" \
+        logprint "Backup of ${HOST} finished $(date +'%F_%T')"
     else
-        logprint_err "Backup of $HOST failed $(date +'%F_%T')"
+        logprint_err "Backup of ${HOST} failed $(date +'%F_%T'). Unable to run command."
+        exit 1
     fi
 else
-    logprint_err "Backup of $HOST failed $(date +'%F_%T')";
-    exit 1;
+    logprint_err "Backup of ${HOST} failed $(date +'%F_%T'). RUN condition not met."
+    exit 1
 fi
 #}}}
 
