@@ -60,9 +60,16 @@ logprint_err () {
         "${1}\n\nPlease check journalctl for more info."
 }
 
+if [[ -n ${DEBUG+x} ]]; then
+  RSYNC_CMD="echo rsync"
+else
+  RSYNC_CMD="rsync"
+fi
+readonly RSYNC_CMD
+
 if [[ -n ${RUN_LOCALLY+x} ]]; then
 
-  rsync -azAX --partial --delete --exclude-from=/etc/backup/exclude.txt \
+  ${RSYNC_CMD} -azAX --partial --delete --exclude-from=/etc/backup/exclude.txt \
       --delete-excluded / \
       /storage/backups/server/bserver/ \
       && (echo "Backup finished $(date +'%F_%T')"; \
@@ -109,7 +116,7 @@ else
       if [ -n "${MAX_SIZE}" ]; then
           logprint "Only backing up files smaller than ${1}"
       fi
-      rsync -aAX --partial --delete --delete-excluded / \
+      ${RSYNC_CMD} -aAX --partial --delete --delete-excluded / \
           --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt \
           "${MAX_SIZE}" \
           backup:/ \
