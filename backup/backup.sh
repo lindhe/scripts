@@ -140,7 +140,7 @@ fi
 ##############################     Run backup     ##############################{{{
 if ${RUN}; then
     logprint "Backup of ${HOST} started at $(date +'%F_%T')";
-    if [ -n "${MAX_SIZE+x}" ]; then
+    if [ -n "${MAX_SIZE}" ]; then
         logprint "Only backing up files no larger than ${MAX_SIZE}"
     fi
     if ${RSYNC_CMD}; then
