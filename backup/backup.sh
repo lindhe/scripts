@@ -68,7 +68,7 @@ readonly RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=
 
 if [[ -n ${LOCAL_BACKUP+x} ]]; then
 
-  if ${RSYNC_CMD} "${RSYNC_FLAGS}" "${BACKUP_SOURCE_DIR}" "${BACKUP_TARGET_DIR}"; then
+  if ${RSYNC_CMD} "${RSYNC_FLAGS}${MAX_SIZE}" "${BACKUP_SOURCE_DIR}" "${BACKUP_TARGET_DIR}"; then
     logprint "Backup finished $(date +'%F_%T')" \
   else
     logprint_err "Backup failed $(date +'%F_%T')"
