@@ -10,13 +10,14 @@ set -euo pipefail
 if [[ "${VERBOSE:-0}" == 2 ]]; then
   set -x
 fi
+
 #}}}
 
 ##############################     constants     ##############################{{{
 
 # Args
-readonly BACKUP_TARGET_DIR="${1}"
-readonly BACKUP_SOURCE_DIR="${2:-/}"
+readonly BACKUP_SOURCE="${1}"
+readonly BACKUP_DESTINATION="${2}"
 readonly MAX_SIZE="${3:+ --max-size ${3}}"
 
 readonly BACKUP_SCRIPT_DIR='/etc/backup'
@@ -39,8 +40,8 @@ readonly LOG_PREFIX='Backup:'
 readonly RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt"
 readonly RSYNC_ARGS=(
     "${MAX_SIZE}"
-    "${BACKUP_SOURCE_DIR}"
-    "${BACKUP_TARGET_DIR}"
+    "${BACKUP_SOURCE}"
+    "${BACKUP_DESTINATION}"
 )
 
 if [[ -n ${DEBUG_FAIL+x} ]]; then
