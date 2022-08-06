@@ -28,7 +28,7 @@ set -euo pipefail
 
 # The first argument given, $1, will be treated as the --max-size
 # If $1 is empty, --max-size is not used.
-MAX_SIZE="${1:+--max-size ${1}}"
+MAX_SIZE="${1:+ --max-size ${1}}"
 
 BACKUP_SCRIPT_DIR='/etc/backup'
 
@@ -117,7 +117,7 @@ else
       if [ -n "${MAX_SIZE}" ]; then
           logprint "Only backing up files smaller than ${1}"
       fi
-      ${RSYNC_CMD} "${RSYNC_FLAGS}" "${MAX_SIZE}" / backup:/ \
+      ${RSYNC_CMD} "${RSYNC_FLAGS}${MAX_SIZE}" / backup:/ \
           && logprint "Backup of $HOST finished $(date +'%F_%T')" \
           || logprint_err "Backup of $HOST failed $(date +'%F_%T')"
   else
