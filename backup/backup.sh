@@ -67,11 +67,12 @@ else
 fi
 readonly RSYNC_CMD
 
+readonly RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt"
+
 if [[ -n ${RUN_LOCALLY+x} ]]; then
 
-  ${RSYNC_CMD} -azAX --partial --delete --exclude-from=/etc/backup/exclude.txt \
-      --delete-excluded / \
-      /storage/backups/server/bserver/ \
+  ${RSYNC_CMD} "${RSYNC_FLAGS}" \
+      / /storage/backups/server/bserver/ \
       && (echo "Backup finished $(date +'%F_%T')"; \
           logger "Backup finished $(date +'%F_%T')") \
       || (echo "Backup failed $(date +'%F_%T')"; \
@@ -116,10 +117,7 @@ else
       if [ -n "${MAX_SIZE}" ]; then
           logprint "Only backing up files smaller than ${1}"
       fi
-      ${RSYNC_CMD} -aAX --partial --delete --delete-excluded / \
-          --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt \
-          "${MAX_SIZE}" \
-          backup:/ \
+      ${RSYNC_CMD} "${RSYNC_FLAGS}" "${MAX_SIZE}" / backup:/ \
           && logprint "Backup of $HOST finished $(date +'%F_%T')" \
           || logprint_err "Backup of $HOST failed $(date +'%F_%T')"
   else
