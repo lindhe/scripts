@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2015
 
 # Checks for authorized Wi-Fi SSID or connected Ethernet before performing
 # backup.
@@ -53,10 +52,11 @@ readonly RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=
 
 if [[ -n ${RUN_LOCALLY+x} ]]; then
 
-  ${RSYNC_CMD} "${RSYNC_FLAGS}" \
-      / /storage/backups/server/bserver/ \
-      && logprint "Backup finished $(date +'%F_%T')" \
-      || logprint_err "Backup failed $(date +'%F_%T')"
+  if ${RSYNC_CMD} "${RSYNC_FLAGS}" / /storage/backups/server/bserver/; then
+    logprint "Backup finished $(date +'%F_%T')" \
+  else
+    logprint_err "Backup failed $(date +'%F_%T')"
+  fi
 
 else
   # Check which device is used for default route
@@ -97,9 +97,13 @@ else
       if [ -n "${MAX_SIZE}" ]; then
           logprint "Only backing up files smaller than ${1}"
       fi
-      ${RSYNC_CMD} "${RSYNC_FLAGS}${MAX_SIZE}" / backup:/ \
-          && logprint "Backup of $HOST finished $(date +'%F_%T')" \
-          || logprint_err "Backup of $HOST failed $(date +'%F_%T')"
+
+      if ${RSYNC_CMD} "${RSYNC_FLAGS}${MAX_SIZE}" / backup:/; then
+          logprint "Backup of $HOST finished $(date +'%F_%T')" \
+      else
+          logprint_err "Backup of $HOST failed $(date +'%F_%T')"
+      fi
+
   else
       logprint_err "Backup of $HOST failed $(date +'%F_%T')";
       exit 1;
