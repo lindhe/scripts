@@ -44,6 +44,15 @@ readonly WLAN_IS_METERED="$(nmcli -g connection.metered connection show "${WLAN_
 
 readonly LOG_PREFIX='Backup:'
 
+if [[ -n ${DEBUG+x} ]]; then
+  RSYNC_CMD="echo rsync"
+else
+  RSYNC_CMD="rsync"
+fi
+readonly RSYNC_CMD
+
+readonly RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt"
+
 # print to both stdout and log
 logprint () {
     if [[ -n ${VERBOSE+x} ]]; then
@@ -63,15 +72,6 @@ logprint_err () {
       notify-send --urgency=critical "${LOG_PREFIX} ${1}\n\nPlease check journalctl for more info."
     fi
 }
-
-if [[ -n ${DEBUG+x} ]]; then
-  RSYNC_CMD="echo rsync"
-else
-  RSYNC_CMD="rsync"
-fi
-readonly RSYNC_CMD
-
-readonly RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt"
 
 if [[ -z ${LOCAL_BACKUP+x} ]]; then  # Check conditions for remote backup
     # Check which device is used for default route
