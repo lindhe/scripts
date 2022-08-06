@@ -40,14 +40,14 @@ readonly WLAN_IS_METERED="$(nmcli -g connection.metered connection show "${WLAN_
 
 readonly LOG_PREFIX='Backup:'
 
+readonly RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt"
+
 if [[ -n ${DEBUG+x} ]]; then
-  RSYNC_CMD="echo rsync"
+  RSYNC_CMD="echo rsync ${RSYNC_FLAGS}"
 else
-  RSYNC_CMD="rsync"
+  RSYNC_CMD="rsync ${RSYNC_FLAGS}"
 fi
 readonly RSYNC_CMD
-
-readonly RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt"
 
 ##############################     functions     ##############################{{{
 
@@ -120,7 +120,7 @@ if $RUN; then
         logprint "Only backing up files smaller than ${1}"
     fi
 
-    if ${RSYNC_CMD} "${RSYNC_FLAGS}${MAX_SIZE}" "${BACKUP_SOURCE_DIR}" "${BACKUP_TARGET_DIR}"; then
+    if ${RSYNC_CMD} "${MAX_SIZE}" "${BACKUP_SOURCE_DIR}" "${BACKUP_TARGET_DIR}"; then
         logprint "Backup of $HOST finished $(date +'%F_%T')" \
     else
         logprint_err "Backup of $HOST failed $(date +'%F_%T')"
