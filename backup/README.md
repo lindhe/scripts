@@ -1,17 +1,16 @@
 # Setup backup scripts
 
-Begin by creating a new zfs volume for the backup on the server:
-`sudo zfs create storage/backups/...`
+1. Begin by creating a new zfs volume for the backup on the server:
 
-```bash
-sudo mkdir /etc/backup
-# Populate /etc/backup/authorized_networks.txt with desired SSID
-sudo cp exclude.txt /etc/backup/exclude.txt
-# Create cronjob: @daily date '+%s' > /etc/backup/alive
-# Edit backup.sh according to your needs
-sudo cp backup.sh /etc/backup/backup.sh
-# Configure /root/.ssh/config with host named backup
-```
+  ```shell
+  sudo zfs create storage/backups/...
+  ```
+
+2. Install the script on the client computer:
+
+  ```shell
+  sudo make install
+  ```
 
 Remember to update the `~/.ssh/authorized_keys` with a new `command="..."` line
 if using this guide:
