@@ -14,7 +14,7 @@ fail() {
 if [[ $# -lt 2 ]]; then
     debug ""
     debug "USAGE:"
-    debug "    ${0} SSID PASSWORD [file.png]"
+    debug "    $(basename "${0}") SSID PASSWORD [file.png]"
     debug ""
     exit 0
 fi
