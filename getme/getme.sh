@@ -116,6 +116,7 @@ elif [[ "${PROGRAM}" == "helmfile" ]]; then
             "${VERSION}"
     )
     readonly PACKAGE_FORMAT="bin"
+    readonly INSTALL_FILE="${PROGRAM}"
 elif [[ "${PROGRAM}" == "git-credential-manager" ]]; then
     readonly DOWNLOAD_URL=$(
         get_gh_release_url \
@@ -174,6 +175,7 @@ if [[ -n ${VERBOSE+x} ]]; then
     stderr "  VERSION:        ${VERSION:-None}"
     stderr "  DOWNLOAD_URL:   ${DOWNLOAD_URL:-None}"
     stderr "  PACKAGE_FORMAT: ${PACKAGE_FORMAT:-None}"
+    stderr "  INSTALL_FILE:   ${INSTALL_FILE:-None}"
     stderr ""
 fi
 
@@ -196,13 +198,14 @@ if [[ -n ${VERBOSE+x} ]]; then
     stderr "Download"
     stderr "  DOWNLOAD_DIR: ${DOWNLOAD_DIR:-None}"
     stderr "  FILENAME:     ${FILENAME:-None}"
+    stderr "  INSTALL_FILE: ${INSTALL_FILE:-None}"
     stderr ""
 fi
 
 ###############################     Install     ###############################
 echo "⌛ Installing ${PROGRAM} …"
 if [[ "${PACKAGE_FORMAT}" == "bin" ]]; then
-    sudo install "${DOWNLOAD_DIR}/${FILENAME}" "/usr/local/bin/${PROGRAM}" \
+    sudo install "${DOWNLOAD_DIR}/${INSTALL_FILE:-${FILENAME}}" "/usr/local/bin/${PROGRAM}" \
         || fail "Unable to install executable ${DOWNLOAD_DIR}/${PROGRAM}"
 elif [[ "${PACKAGE_FORMAT}" == "deb" ]]; then
     sudo chown -R _apt:root "${DOWNLOAD_DIR}"  # Not sure why, but apt has a warning when installing from $(mktemp -d) unless I chown it like so. https://askubuntu.com/a/1205517/80226
