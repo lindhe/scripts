@@ -13,7 +13,7 @@ fail() {
 
 if [[ -n ${VERBOSE+x} ]]; then
     stderr "GetMe"
-    stderr "  …some programs!"
+    stderr "  … some programs!"
     stderr ""
 fi
 
