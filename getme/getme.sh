@@ -33,6 +33,7 @@ if [ $# -lt 1 ]; then
   stderr "  helm"
   stderr "  helmfile"
   stderr "  k3d"
+  stderr "  kubectl"
   stderr "  nvm"
   stderr "  sops"
   stderr "  yq"
@@ -130,6 +131,14 @@ elif [[ "${PROGRAM}" == "k3d" ]]; then
             "${VERSION}" \
             'k3d-linux-amd64'
     )
+    readonly PACKAGE_FORMAT="bin"
+elif [[ "${PROGRAM}" == "kubectl" ]]; then
+    if [[ "${ARG_VERSION}" == "latest" ]]; then
+        readonly KUBECTL_VERSION="$(curl -L -s https://dl.k8s.io/release/stable.txt)"
+    else
+        readonly KUBECTL_VERSION="${VERSION}"
+    fi
+    readonly DOWNLOAD_URL="https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
     readonly PACKAGE_FORMAT="bin"
 elif [[ "${PROGRAM}" == "nvm" ]]; then
     if [[ "${ARG_VERSION}" == "latest" ]]; then
