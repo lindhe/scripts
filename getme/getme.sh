@@ -106,7 +106,15 @@ get_gh_release_url() {
 }
 
 ###########################     Program selector     ###########################
-if [[ "${PROGRAM}" == "helm" ]]; then
+if [[ "${PROGRAM}" == "git-credential-manager" ]]; then
+    readonly DOWNLOAD_URL=$(
+        get_gh_release_url \
+            "GitCredentialManager" "${PROGRAM}" \
+            "${VERSION}" \
+            '.*gcm-linux_amd64.*.deb'
+    )
+    readonly PACKAGE_FORMAT="deb"
+elif [[ "${PROGRAM}" == "helm" ]]; then
     readonly DOWNLOAD_URL="https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3"
     readonly PACKAGE_FORMAT="bash"
 elif [[ "${PROGRAM}" == "helmfile" ]]; then
@@ -117,14 +125,6 @@ elif [[ "${PROGRAM}" == "helmfile" ]]; then
     )
     readonly PACKAGE_FORMAT="bin"
     readonly INSTALL_FILE="${PROGRAM}"
-elif [[ "${PROGRAM}" == "git-credential-manager" ]]; then
-    readonly DOWNLOAD_URL=$(
-        get_gh_release_url \
-            "GitCredentialManager" "${PROGRAM}" \
-            "${VERSION}" \
-            '.*gcm-linux_amd64.*.deb'
-    )
-    readonly PACKAGE_FORMAT="deb"
 elif [[ "${PROGRAM}" == "k3d" ]]; then
     readonly DOWNLOAD_URL=$(
         get_gh_release_url \
