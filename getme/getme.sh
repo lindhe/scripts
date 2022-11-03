@@ -186,10 +186,10 @@ readonly FILENAME=$(basename "${DOWNLOAD_URL}")
 echo "⏳ Downloading ${PROGRAM} …"
 if [[ "${FILENAME}" == *.tar.gz ]]; then
     wget -qO - "${DOWNLOAD_URL}" | tar -xzC "${DOWNLOAD_DIR}" \
-        || fail "Unable to download ${DOWNLOAD_URL}"
+        || fail "Unable to download .tar.gz: ${DOWNLOAD_URL}"
 else
     wget -qO "${DOWNLOAD_DIR}/${FILENAME}" "${DOWNLOAD_URL}" \
-        || fail "Unable to download ${DOWNLOAD_URL}"
+        || fail "Unable to download: ${DOWNLOAD_URL}"
 fi
 echo "✅ Download complete!"
 
