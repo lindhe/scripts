@@ -189,12 +189,18 @@ fi
 DOWNLOAD_DIR=$(mktemp -d)
 readonly FILENAME=$(basename "${DOWNLOAD_URL}")
 
+if [[ -n ${VERBOSE+x} ]]; then
+    readonly WGET_QUIET=''
+else
+    readonly WGET_QUIET='--quiet'
+fi
+
 echo "⏳ Downloading ${PROGRAM} …"
 if [[ "${FILENAME}" == *.tar.gz ]]; then
-    wget -qO - "${DOWNLOAD_URL}" | tar -xzC "${DOWNLOAD_DIR}" \
+    wget "${WGET_QUIET}" -O - "${DOWNLOAD_URL}" | tar -xzC "${DOWNLOAD_DIR}" \
         || fail "Unable to download .tar.gz: ${DOWNLOAD_URL}"
 else
-    wget -qO "${DOWNLOAD_DIR}/${FILENAME}" "${DOWNLOAD_URL}" \
+    wget "${WGET_QUIET}" -O "${DOWNLOAD_DIR}/${FILENAME}" "${DOWNLOAD_URL}" \
         || fail "Unable to download: ${DOWNLOAD_URL}"
 fi
 echo "✅ Download complete!"
