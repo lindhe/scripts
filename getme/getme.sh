@@ -18,6 +18,10 @@ if [[ -n ${VERBOSE+x} ]]; then
     stderr ""
 fi
 
+if [[ ${VERBOSE:-0} -gt 1 ]]; then
+    set -x
+fi
+
 if [ $# -lt 1 ]; then
   stderr "USAGE:"
   stderr ""
@@ -86,14 +90,15 @@ get_gh_release_url() {
 
     if [[ -n ${VERBOSE+x} ]]; then
         stderr ""
-        stderr "RELEASE: ${RELEASE:-None}"
+        stderr "RELEASE: ${RELEASE:?}"
         stderr ""
     fi
 
     local -r RELEASE_JSON=$(
         curl --silent -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${OWNER}/${REPO}/releases/${RELEASE}"
-    ) || fail "Unable to get RELEASE_JSON from GitHub."
+            "https://api.github.com/repos/${OWNER}/${REPO}/releases/${RELEASE}" \
+        || fail "Unable to get RELEASE_JSON from GitHub."
+    )
 
     jq -r "
         .assets[]
