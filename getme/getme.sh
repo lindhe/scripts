@@ -35,6 +35,7 @@ if [ $# -lt 1 ]; then
   stderr "SUPPORTED PROGRAMS:"
   stderr ""
   stderr "  git-credential-manager"
+  stderr "  hadolint"
   stderr "  helm"
   stderr "  helmfile"
   stderr "  k3d"
@@ -120,6 +121,14 @@ if [[ "${PROGRAM}" == "git-credential-manager" ]]; then
             '.*gcm-linux_amd64.*.deb'
     )
     readonly PACKAGE_FORMAT="deb"
+elif [[ "${PROGRAM}" == "hadolint" ]]; then
+    readonly DOWNLOAD_URL=$(
+        get_gh_release_url \
+            "${PROGRAM}" "${PROGRAM}" \
+            "${VERSION}" \
+            "hadolint-Linux-x86_64"
+    )
+    readonly PACKAGE_FORMAT="bin"
 elif [[ "${PROGRAM}" == "helm" ]]; then
     readonly DOWNLOAD_URL="https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3"
     readonly PACKAGE_FORMAT="bash"
