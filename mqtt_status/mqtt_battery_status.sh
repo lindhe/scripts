@@ -4,7 +4,7 @@
 
 if [[ "${IAMAT}" == "home" ]]; then
     mosquitto_pub \
-        -t '/laptops/blaptop/battery/power/percent' \
+        -t '/laptops/blaptop/battery/percentage' \
         -m "$(cat /sys/class/power_supply/BAT0/capacity)"
     mosquitto_pub \
         -t '/laptops/blaptop/battery/power/state' \
