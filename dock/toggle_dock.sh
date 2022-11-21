@@ -1,18 +1,17 @@
 #!/bin/bash
 
 RES=''
+SCRIPTS_LOCATION="${HOME}/git/lindhe/scripts"
 
-~/scripts/dock/check_for_dock.sh
-
-if [ $? -eq 0 ]; then
-    ~/scripts/dock/monman.py -a ${IAMAT:+~/.config/monitors/${IAMAT}.json} \
+if "${SCRIPTS_LOCATION}"/dock/check_for_dock.sh; then
+    "${SCRIPTS_LOCATION}"/dock/monman.py -a ${IAMAT:+~/.config/monitors/${IAMAT}.json} \
         && RES='Docking successful!' || RES='Docking failed!';
 else
-    ~/scripts/dock/monman.py -d \
+    "${SCRIPTS_LOCATION}"/dock/monman.py -d \
         && RES='Undocking sucessful!' || RES='Undocking failed!';
 fi
 
-logger $RES;
+logger "${RES}";
 
 # Resource .xprofile
 ~/.xprofile
