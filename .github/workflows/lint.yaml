@@ -1,0 +1,26 @@
+---
+name: Lint and checks
+run-name: Linting ${{ github.sha }}
+on:  # yamllint disable-line rule:truthy
+  - push
+  - pull_request
+jobs:
+  ShellCheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out ${{ github.repository }}:${{ github.ref_name }}
+        uses: actions/checkout@v3
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          ignore_paths: >-
+            i3blocks/contrib
+          ignore_names: >-
+            .zsh*
+  yamllint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out ${{ github.repository }}:${{ github.ref_name }}
+        uses: actions/checkout@v3
+      - name: Frenck's yamllint
+        uses: frenck/action-yamllint@v1.4.1
