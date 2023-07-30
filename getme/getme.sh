@@ -67,10 +67,10 @@ if [[ -n ${VERBOSE+x} ]]; then
 fi
 
 get_gh_release_url() {
-    local -r OWNER="${1}"
-    local -r REPO="${2}"
-    local -r TAG="${3:-latest}"
-    local -r REGEX="${4:-linux_amd64}"
+    declare -r OWNER="${1}"
+    declare -r REPO="${2}"
+    declare -r TAG="${3:-latest}"
+    declare -r REGEX="${4:-linux_amd64}"
 
     if [[ -n ${VERBOSE+x} ]]; then
         stderr ""
@@ -95,7 +95,7 @@ get_gh_release_url() {
         stderr ""
     fi
 
-    local -r RELEASE_JSON=$(
+    declare -r RELEASE_JSON=$(
         curl --silent -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${OWNER}/${REPO}/releases/${RELEASE}" \
         || fail "Unable to get RELEASE_JSON from GitHub."
