@@ -8,7 +8,9 @@ stderr() {
 }
 
 fail() {
-    echo "FAILURE: ${1}" >&2
+    stderr "${1}"
+    stderr ""
+    stderr "Exiting …"
     exit "${2:-1}"
 }
 
@@ -114,7 +116,7 @@ get_gh_release_url() {
 
 ###########################     Program selector     ###########################
 if [[ "${PROGRAM}" == "git-credential-manager" ]]; then
-    readonly DOWNLOAD_URL=$(
+    DOWNLOAD_URL=$(
         get_gh_release_url \
             "GitCredentialManager" "${PROGRAM}" \
             "${VERSION}" \
@@ -122,7 +124,7 @@ if [[ "${PROGRAM}" == "git-credential-manager" ]]; then
     )
     readonly PACKAGE_FORMAT="deb"
 elif [[ "${PROGRAM}" == "hadolint" ]]; then
-    readonly DOWNLOAD_URL=$(
+    DOWNLOAD_URL=$(
         get_gh_release_url \
             "${PROGRAM}" "${PROGRAM}" \
             "${VERSION}" \
@@ -133,7 +135,7 @@ elif [[ "${PROGRAM}" == "helm" ]]; then
     readonly DOWNLOAD_URL="https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3"
     readonly PACKAGE_FORMAT="bash"
 elif [[ "${PROGRAM}" == "helmfile" ]]; then
-    readonly DOWNLOAD_URL=$(
+    DOWNLOAD_URL=$(
         get_gh_release_url \
             "${PROGRAM}" "${PROGRAM}" \
             "${VERSION}"
@@ -141,7 +143,7 @@ elif [[ "${PROGRAM}" == "helmfile" ]]; then
     readonly PACKAGE_FORMAT="bin"
     readonly INSTALL_FILE="${PROGRAM}"
 elif [[ "${PROGRAM}" == "k3d" ]]; then
-    readonly DOWNLOAD_URL=$(
+    DOWNLOAD_URL=$(
         get_gh_release_url \
             "k3d-io" "${PROGRAM}" \
             "${VERSION}" \
@@ -150,7 +152,8 @@ elif [[ "${PROGRAM}" == "k3d" ]]; then
     readonly PACKAGE_FORMAT="bin"
 elif [[ "${PROGRAM}" == "kubectl" ]]; then
     if [[ "${ARG_VERSION}" == "latest" ]]; then
-        readonly KUBECTL_VERSION="$(curl -L -s https://dl.k8s.io/release/stable.txt)"
+        KUBECTL_VERSION="$(curl -L -s https://dl.k8s.io/release/stable.txt)"
+        declare -r KUBECTL_VERSION
     else
         readonly KUBECTL_VERSION="${VERSION}"
     fi
@@ -164,7 +167,7 @@ elif [[ "${PROGRAM}" == "nvm" ]]; then
     fi
     readonly PACKAGE_FORMAT="bash"
 elif [[ "${PROGRAM}" == "sops" ]]; then
-    readonly DOWNLOAD_URL=$(
+    DOWNLOAD_URL=$(
         get_gh_release_url \
             "mozilla" "${PROGRAM}" \
             "${VERSION}" \
@@ -172,7 +175,7 @@ elif [[ "${PROGRAM}" == "sops" ]]; then
     )
     readonly PACKAGE_FORMAT="deb"
 elif [[ "${PROGRAM}" == "yq" ]]; then
-    readonly DOWNLOAD_URL=$(
+    DOWNLOAD_URL=$(
         get_gh_release_url \
             "mikefarah" "${PROGRAM}" \
             "${VERSION}" \
@@ -182,6 +185,7 @@ elif [[ "${PROGRAM}" == "yq" ]]; then
 else
     fail "❌ ERROR: program ${PROGRAM} not supported."
 fi
+declare -r DOWNLOAD_URL
 
 if [[ -n ${VERBOSE+x} ]]; then
     stderr ""
@@ -196,7 +200,8 @@ fi
 
 ###############################     Download     ###############################
 DOWNLOAD_DIR=$(mktemp -d)
-readonly FILENAME=$(basename "${DOWNLOAD_URL}")
+FILENAME=$(basename "${DOWNLOAD_URL}")
+declare -r FILENAME
 
 if [[ -n ${VERBOSE+x} ]]; then
     readonly WGET_QUIET=''
@@ -239,7 +244,7 @@ elif [[ "${PACKAGE_FORMAT}" == "bash" ]]; then
         else
             readonly HELM_VER=""
         fi
-        bash "${DOWNLOAD_DIR}/${FILENAME}" ${HELM_VER} \
+        bash "${DOWNLOAD_DIR}/${FILENAME}" "${HELM_VER}" \
             || fail "Unable to install Helm: ${DOWNLOAD_DIR}/${FILENAME}"
     else
         bash "${DOWNLOAD_DIR}/${FILENAME}" \
@@ -249,4 +254,3 @@ else
     fail "ERROR: Package format was ${PACKAGE_FORMAT}  ¯\_(ツ)_/¯"
 fi
 echo "😀 Installation complete!"
-
