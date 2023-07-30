@@ -32,8 +32,10 @@ readonly BACKUP_DESTINATION="${2}"
 readonly MAX_SIZE="${3:+ --max-size ${3}}"
 
 readonly BACKUP_SCRIPT_DIR='/etc/backup'
-readonly CHARGING=$(acpi --ac-adapter | grep "on-line")
-readonly WLAN_SSID=$(iwgetid --raw);
+CHARGING=$(acpi --ac-adapter | grep "on-line")
+declare -r CHARGING
+WLAN_SSID=$(iwgetid --raw);
+declare -r WLAN_SSID
 readonly LIST_OF_ETH_IF=(
     eth0
     eth1
@@ -45,7 +47,8 @@ else
     RUN=false
 fi
 
-readonly WLAN_IS_METERED="$(nmcli -g connection.metered connection show "${WLAN_SSID}")"
+WLAN_IS_METERED="$(nmcli -g connection.metered connection show "${WLAN_SSID}")"
+declare -r WLAN_IS_METERED
 readonly LOG_PREFIX='Backup:'
 
 readonly RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt"
