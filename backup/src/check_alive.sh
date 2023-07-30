@@ -12,7 +12,8 @@ readonly ALIVE_FILE="${1:-/etc/backup/alive}"
 readonly ERROR_TEXT="No backup was made during the last week!"
 
 readonly MAX_AGE=604800
-readonly NOW=$(date '+%s')
+NOW=$(date '+%s')
+declare -r NOW
 readonly TIME_DELTA=$(( NOW - $(cat "${ALIVE_FILE}") ))
 
 if [[ -n ${VERBOSE+x} ]]; then
