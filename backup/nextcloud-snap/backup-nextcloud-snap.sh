@@ -106,8 +106,10 @@ else
     eval "${TAR_CMD}"
 fi
 
-if [[ ! $? -eq 0 ]]; then
-    fail "Export failed with exit code ${?}" $?
+EXIT_CODE="${?}"
+declare -r EXIT_CODE
+if [[ ! ${EXIT_CODE} -eq 0 ]]; then
+    fail "Export failed with exit code ${EXIT_CODE}" "${EXIT_CODE}"
 fi
 if [[ ${VERBOSE} -ge 1 ]]; then echo "Export complete!"; fi
 
