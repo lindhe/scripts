@@ -33,7 +33,6 @@ missing_dependencies=false
 declare -r dependencies=(
     logger
     nmcli
-    notify-send
     rsync
 )
 for dep in "${dependencies[@]}"; do
@@ -109,7 +108,7 @@ logprint() {
     fi
     logger "${LOG_PREFIX} ${1}"
     if (command -v notify-send &> /dev/null); then
-        notify-send --urgency=low "${LOG_PREFIX} ${1}\n\nPlease check journalctl for more info."
+        su andreas -c "notify-send --urgency=low \"${LOG_PREFIX} ${1}\n\nPlease check journalctl for more info.\""
     fi
 }
 
@@ -118,7 +117,7 @@ logprint_err() {
     stderr "${LOG_PREFIX} ${1}"
     logger -p syslog.err "${LOG_PREFIX} ${1}"
     if (command -v notify-send &> /dev/null); then
-        notify-send --urgency=critical "${LOG_PREFIX} ${1}\n\nPlease check journalctl for more info."
+        su andreas -c "notify-send --urgency=critical \"${LOG_PREFIX} ${1}\n\nPlease check journalctl for more info.\""
     fi
 }
 #}}}
