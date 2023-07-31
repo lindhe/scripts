@@ -7,7 +7,7 @@ debug() {
 }
 
 fail() {
-    debug "${1}"
+    stderr "${1}"
     exit "${2:-1}"
 }
 
@@ -15,16 +15,16 @@ declare -r DEFAULT_SUFFIX='-json.log'
 declare -r DEFAULT_SRC_DIR='/var/lib/docker/containers'
 
 if [[ $# -lt 1 ]]; then
-    debug ""
-    debug "Symlinks Docker logs to DST_DIR and prints each container's SHA"
-    debug ""
-    debug "USAGE:"
-    debug "    ${0} DST_DIR [SUFFIX] [SRC_DIR]"
-    debug ""
-    debug "DEFAULTS:"
-    debug "    SUFFIX='${DEFAULT_SUFFIX}'"
-    debug "    SRC_DIR='${DEFAULT_SRC_DIR}'"
-    debug ""
+    stderr ""
+    stderr "Symlinks Docker logs to DST_DIR and prints each container's SHA"
+    stderr ""
+    stderr "USAGE:"
+    stderr "    ${0} DST_DIR [SUFFIX] [SRC_DIR]"
+    stderr ""
+    stderr "DEFAULTS:"
+    stderr "    SUFFIX='${DEFAULT_SUFFIX}'"
+    stderr "    SRC_DIR='${DEFAULT_SRC_DIR}'"
+    stderr ""
     exit 0
 fi
 
