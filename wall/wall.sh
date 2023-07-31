@@ -1,16 +1,34 @@
 #!/usr/bin/env bash
-
-# Wrapper for the wall command.
-#
-# My intention with this scirpt is to intercept anything written to wall and
-# broadcast it to a more accessable place like syslog and/or mail.
-#
-# Inspired by https://unix.stackexchange.com/a/541763/33928
 #
 # License: MIT
 # Author: Andreas Lindhé
 
 set -euo pipefail
+
+stderr() {
+    echo "${@}" 1>&2
+}
+
+fail() {
+    stderr "${1}"
+    stderr ""
+    stderr "Exiting …"
+    exit "${2:-1}"
+}
+
+missing_dependencies=false
+declare -r dependencies=(
+  sendmail
+)
+for dep in "${dependencies[@]}"; do
+  if ! command -v "${dep}" &> /dev/null; then
+    stderr "❌ ERROR: Missing dependency ${dep}"
+    missing_dependencies=true
+  fi
+done
+if ${missing_dependencies}; then
+  fail 'Please install the missing dependencies!'
+fi
 
 if [[ $# -eq 0 ]]; then
     # no args => stdin
@@ -19,7 +37,6 @@ else
     inputarray=("${@}")
 fi
 declare -r inputarray
-
 
 logger "Message from wall:
 ${inputarray[*]}
