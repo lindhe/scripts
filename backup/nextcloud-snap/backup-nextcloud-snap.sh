@@ -68,7 +68,7 @@ if [[ -n ${DEBUG+x} ]]; then
         # shellcheck disable=SC2005
         echo "$(eval echo "${NC_EXPORT_CMD}")"
     fi
-    declare -r NC_EXPORT="Successfully exported /var/snap/nextcloud/common/backups/20220720-194312"
+    declare -r NC_EXPORT="(debug) Successfully exported /var/snap/nextcloud/common/backups/20220720-194312"
 else
     if [[ ${VERBOSE} -ge 1 ]]; then
         # shellcheck disable=SC2005
