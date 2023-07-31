@@ -6,13 +6,13 @@ set -euo pipefail
 if [[ -z ${VERBOSE+x} ]]; then
     VERBOSE=0
 fi
-readonly VERBOSE
+declare -r VERBOSE
 
 if [[ "${VERBOSE}" -ge 5 ]]; then
     set -x
 fi
 
-readonly MAX_ARCHIVE_SIZE="${MAX_ARCHIVE_SIZE:-$((1024**4))}"  # Size in KiB
+declare -r MAX_ARCHIVE_SIZE="${MAX_ARCHIVE_SIZE:-$((1024**4))}"  # Size in KiB
 
 debug() {
     echo "${@}" 1>&2
@@ -35,7 +35,7 @@ if [[ -z "${1:-}" ]]; then
     exit
 fi
 
-readonly TARGET_BACKUP_DIR="${1/%\/}"  # Remove trailing /
+declare -r TARGET_BACKUP_DIR="${1/%\/}"  # Remove trailing /
 if [[ ${VERBOSE} -ge 1 ]]; then echo "${TARGET_BACKUP_DIR@A}"; fi
 
 if [[ ${VERBOSE} -ge 1 ]]; then echo "Backup started …"; fi
@@ -45,7 +45,7 @@ if [[ ${VERBOSE} -eq 0 ]]; then
 else
     NC_EXPORT_CMD='nextcloud.export'
 fi
-readonly NC_EXPORT_CMD
+declare -r NC_EXPORT_CMD
 
 if [[ ${VERBOSE} -ge 1 ]]; then echo "${NC_EXPORT_CMD@A}"; fi
 
@@ -54,14 +54,14 @@ if [[ -n ${DEBUG+x} ]]; then
         # shellcheck disable=SC2005
         echo "$(eval echo "${NC_EXPORT_CMD}")"
     fi
-    readonly NC_EXPORT="Successfully exported /var/snap/nextcloud/common/backups/20220720-194312"
+    declare -r NC_EXPORT="Successfully exported /var/snap/nextcloud/common/backups/20220720-194312"
 else
     if [[ ${VERBOSE} -ge 1 ]]; then
         # shellcheck disable=SC2005
         echo "$(eval echo "${NC_EXPORT_CMD}")" # TODO
     fi
     NC_EXPORT=$(eval "${NC_EXPORT_CMD}")
-    readonly NC_EXPORT
+    declare -r NC_EXPORT
 fi
 
 if [[ ${VERBOSE} -ge 2 ]]; then echo "${NC_EXPORT@A}"; fi
@@ -71,19 +71,19 @@ if [[ $? -eq 0 ]]; then
 
     SUCCESS_STRING=$(echo "${NC_EXPORT}" | grep "Successfully exported") \
         || fail "Grep unexpectedly could not find substring despite successful export!"
-    readonly SUCCESS_STRING
+    declare -r SUCCESS_STRING
     if [[ ${VERBOSE} -ge 2 ]]; then echo "${SUCCESS_STRING@A}"; fi
 
     NC_BACKUP_PATH="$(echo "${SUCCESS_STRING}" | awk '{ print $(NF) }')"
-    readonly NC_BACKUP_PATH
+    declare -r NC_BACKUP_PATH
     if [[ ${VERBOSE} -ge 2 ]]; then echo "${NC_BACKUP_PATH@A}"; fi
 
     NC_BACKUP_DIR="$(dirname "${NC_BACKUP_PATH}")"
-    readonly NC_BACKUP_DIR
+    declare -r NC_BACKUP_DIR
     if [[ ${VERBOSE} -ge 2 ]]; then echo "${NC_BACKUP_DIR@A}"; fi
 
     BACKUP_NAME="$(basename "${SUCCESS_STRING}")"
-    readonly BACKUP_NAME
+    declare -r BACKUP_NAME
     if [[ ${VERBOSE} -ge 2 ]]; then echo "${BACKUP_NAME@A}"; fi
 
 else
@@ -93,7 +93,7 @@ fi
 if [[ ${VERBOSE} -ge 1 ]]; then echo "Exporting backup …"; fi
 if [[ ${VERBOSE} -ge 3 ]]; then
     # shellcheck disable=SC2034
-    readonly TAR_VERBOSE="--verbose"
+    declare -r TAR_VERBOSE="--verbose"
 fi
 # Using `${NC_BACKUP_DIR:1}` removes the leading slash, making the path
 # relative. That, together with `-C /`, surpresses an warning print from tar
@@ -116,7 +116,7 @@ if [[ ${VERBOSE} -ge 1 ]]; then echo "Export complete!"; fi
 if [[ ${VERBOSE} -ge 1 ]]; then echo "Cleaning up directory ${NC_BACKUP_PATH} …"; fi
 if [[ ${VERBOSE} -ge 3 ]]; then
     # shellcheck disable=SC2034
-    readonly RM_VERBOSE="--verbose"
+    declare -r RM_VERBOSE="--verbose"
 fi
 # shellcheck disable=SC2016,2089
 CLEANUP_CMD='rm "${RM_VERBOSE:-}" -rf "${NC_BACKUP_PATH}"'

@@ -18,7 +18,7 @@ if [[ $# -eq 0 ]]; then
 else
     inputarray=("${@}")
 fi
-readonly inputarray
+declare -r inputarray
 
 
 logger "Message from wall:

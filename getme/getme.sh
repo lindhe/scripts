@@ -48,15 +48,15 @@ if [ $# -lt 1 ]; then
   exit
 fi
 
-readonly PROGRAM="${1}"
-readonly ARG_VERSION="${2:-latest}"
-readonly NORM_VERSION="${ARG_VERSION/#v}" # Normalize v1.2.3 to 1.2.3
+declare -r PROGRAM="${1}"
+declare -r ARG_VERSION="${2:-latest}"
+declare -r NORM_VERSION="${ARG_VERSION/#v}" # Normalize v1.2.3 to 1.2.3
 
 # Ensure we only prefix numeric versions with v
 if [[ "${NORM_VERSION::1}" =~ [[:digit:]] ]]; then
-    readonly VERSION="v${NORM_VERSION}"
+    declare -r VERSION="v${NORM_VERSION}"
 else
-    readonly VERSION="${NORM_VERSION}"
+    declare -r VERSION="${NORM_VERSION}"
 fi
 
 if [[ -n ${VERBOSE+x} ]]; then
@@ -122,7 +122,7 @@ if [[ "${PROGRAM}" == "git-credential-manager" ]]; then
             "${VERSION}" \
             '.*gcm-linux_amd64.*.deb'
     )
-    readonly PACKAGE_FORMAT="deb"
+    declare -r PACKAGE_FORMAT="deb"
 elif [[ "${PROGRAM}" == "hadolint" ]]; then
     DOWNLOAD_URL=$(
         get_gh_release_url \
@@ -130,18 +130,18 @@ elif [[ "${PROGRAM}" == "hadolint" ]]; then
             "${VERSION}" \
             "hadolint-Linux-x86_64"
     )
-    readonly PACKAGE_FORMAT="bin"
+    declare -r PACKAGE_FORMAT="bin"
 elif [[ "${PROGRAM}" == "helm" ]]; then
-    readonly DOWNLOAD_URL="https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3"
-    readonly PACKAGE_FORMAT="bash"
+    declare -r DOWNLOAD_URL="https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3"
+    declare -r PACKAGE_FORMAT="bash"
 elif [[ "${PROGRAM}" == "helmfile" ]]; then
     DOWNLOAD_URL=$(
         get_gh_release_url \
             "${PROGRAM}" "${PROGRAM}" \
             "${VERSION}"
     )
-    readonly PACKAGE_FORMAT="bin"
-    readonly INSTALL_FILE="${PROGRAM}"
+    declare -r PACKAGE_FORMAT="bin"
+    declare -r INSTALL_FILE="${PROGRAM}"
 elif [[ "${PROGRAM}" == "k3d" ]]; then
     DOWNLOAD_URL=$(
         get_gh_release_url \
@@ -149,23 +149,23 @@ elif [[ "${PROGRAM}" == "k3d" ]]; then
             "${VERSION}" \
             'k3d-linux-amd64'
     )
-    readonly PACKAGE_FORMAT="bin"
+    declare -r PACKAGE_FORMAT="bin"
 elif [[ "${PROGRAM}" == "kubectl" ]]; then
     if [[ "${ARG_VERSION}" == "latest" ]]; then
         KUBECTL_VERSION="$(curl -L -s https://dl.k8s.io/release/stable.txt)"
         declare -r KUBECTL_VERSION
     else
-        readonly KUBECTL_VERSION="${VERSION}"
+        declare -r KUBECTL_VERSION="${VERSION}"
     fi
-    readonly DOWNLOAD_URL="https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
-    readonly PACKAGE_FORMAT="bin"
+    declare -r DOWNLOAD_URL="https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+    declare -r PACKAGE_FORMAT="bin"
 elif [[ "${PROGRAM}" == "nvm" ]]; then
     if [[ "${ARG_VERSION}" == "latest" ]]; then
-        readonly DOWNLOAD_URL="https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh"
+        declare -r DOWNLOAD_URL="https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh"
     else
-        readonly DOWNLOAD_URL="https://raw.githubusercontent.com/nvm-sh/nvm/${VERSION}/install.sh"
+        declare -r DOWNLOAD_URL="https://raw.githubusercontent.com/nvm-sh/nvm/${VERSION}/install.sh"
     fi
-    readonly PACKAGE_FORMAT="bash"
+    declare -r PACKAGE_FORMAT="bash"
 elif [[ "${PROGRAM}" == "sops" ]]; then
     DOWNLOAD_URL=$(
         get_gh_release_url \
@@ -173,7 +173,7 @@ elif [[ "${PROGRAM}" == "sops" ]]; then
             "${VERSION}" \
             '.*_amd64.deb'
     )
-    readonly PACKAGE_FORMAT="deb"
+    declare -r PACKAGE_FORMAT="deb"
 elif [[ "${PROGRAM}" == "yq" ]]; then
     DOWNLOAD_URL=$(
         get_gh_release_url \
@@ -181,7 +181,7 @@ elif [[ "${PROGRAM}" == "yq" ]]; then
             "${VERSION}" \
             '.*_linux_amd64$'
     )
-    readonly PACKAGE_FORMAT="bin"
+    declare -r PACKAGE_FORMAT="bin"
 else
     fail "❌ ERROR: program ${PROGRAM} not supported."
 fi
@@ -204,9 +204,9 @@ FILENAME=$(basename "${DOWNLOAD_URL}")
 declare -r FILENAME
 
 if [[ -n ${VERBOSE+x} ]]; then
-    readonly WGET_QUIET=''
+    declare -r WGET_QUIET=''
 else
-    readonly WGET_QUIET='--quiet'
+    declare -r WGET_QUIET='--quiet'
 fi
 
 echo "⏳ Downloading ${PROGRAM} …"
@@ -240,9 +240,9 @@ elif [[ "${PACKAGE_FORMAT}" == "deb" ]]; then
 elif [[ "${PACKAGE_FORMAT}" == "bash" ]]; then
     if [[ "${PROGRAM}" == "helm" ]]; then
         if [[ "${ARG_VERSION}" != "latest" ]]; then
-            readonly HELM_VER="--version ${VERSION}"
+            declare -r HELM_VER="--version ${VERSION}"
         else
-            readonly HELM_VER=""
+            declare -r HELM_VER=""
         fi
         bash "${DOWNLOAD_DIR}/${FILENAME}" "${HELM_VER}" \
             || fail "Unable to install Helm: ${DOWNLOAD_DIR}/${FILENAME}"

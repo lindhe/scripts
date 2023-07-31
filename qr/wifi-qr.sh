@@ -19,15 +19,15 @@ if [[ $# -lt 2 ]]; then
     exit 0
 fi
 
-readonly SSID="${1}"
-readonly PASSWORD="${2//;/\\;}"  # Sanitize the password from bad characters
-readonly ENC_TYPE=WPA
+declare -r SSID="${1}"
+declare -r PASSWORD="${2//;/\\;}"  # Sanitize the password from bad characters
+declare -r ENC_TYPE=WPA
 
 
 if [[ $# -eq 3 ]]; then
-    readonly QR_CMD="qrencode --output=${3}"
+    declare -r QR_CMD="qrencode --output=${3}"
 else
-    readonly QR_CMD='qrencode -t utf8 -o -'
+    declare -r QR_CMD='qrencode -t utf8 -o -'
 fi
 
 echo -n "WIFI:S:${SSID};T:${ENC_TYPE};P:${PASSWORD};;" | ${QR_CMD}

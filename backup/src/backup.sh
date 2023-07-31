@@ -27,16 +27,16 @@ fi
 ##############################     constants     ##############################{{{
 
 # Args
-readonly BACKUP_SOURCE="${1}"
-readonly BACKUP_DESTINATION="${2}"
-readonly MAX_SIZE="${3:+ --max-size ${3}}"
+declare -r BACKUP_SOURCE="${1}"
+declare -r BACKUP_DESTINATION="${2}"
+declare -r MAX_SIZE="${3:+ --max-size ${3}}"
 
-readonly BACKUP_SCRIPT_DIR='/etc/backup'
+declare -r BACKUP_SCRIPT_DIR='/etc/backup'
 CHARGING=$(acpi --ac-adapter | grep "on-line")
 declare -r CHARGING
 WLAN_SSID=$(iwgetid --raw);
 declare -r WLAN_SSID
-readonly LIST_OF_ETH_IF=(
+declare -r LIST_OF_ETH_IF=(
     eth0
     eth1
 )
@@ -49,10 +49,10 @@ fi
 
 WLAN_IS_METERED="$(nmcli -g connection.metered connection show "${WLAN_SSID}")"
 declare -r WLAN_IS_METERED
-readonly LOG_PREFIX='Backup:'
+declare -r LOG_PREFIX='Backup:'
 
-readonly RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt"
-readonly RSYNC_ARGS=(
+declare -r RSYNC_FLAGS="-azAX --partial --delete --delete-excluded --exclude-from=${BACKUP_SCRIPT_DIR}/exclude.txt"
+declare -r RSYNC_ARGS=(
     "${MAX_SIZE}"
     "${BACKUP_SOURCE}"
     "${BACKUP_DESTINATION}"
@@ -68,8 +68,8 @@ else
   RSYNC_CMD="rsync ${RSYNC_FLAGS} ${RSYNC_ARGS[*]}"
   HOST="$(hostname)"
 fi
-readonly HOST
-readonly RSYNC_CMD
+declare -r HOST
+declare -r RSYNC_CMD
 
 #}}}
 

@@ -8,13 +8,13 @@ if [[ "${VERBOSE:-0}" == 2 ]]; then
   set -x
 fi
 
-readonly ALIVE_FILE="${1:-/etc/backup/alive}"
-readonly ERROR_TEXT="No backup was made during the last week!"
+declare -r ALIVE_FILE="${1:-/etc/backup/alive}"
+declare -r ERROR_TEXT="No backup was made during the last week!"
 
-readonly MAX_AGE=604800
+declare -r MAX_AGE=604800
 NOW=$(date '+%s')
 declare -r NOW
-readonly TIME_DELTA=$(( NOW - $(cat "${ALIVE_FILE}") ))
+declare -r TIME_DELTA=$(( NOW - $(cat "${ALIVE_FILE}") ))
 
 if [[ -n ${VERBOSE+x} ]]; then
   echo "${ALIVE_FILE@A}"

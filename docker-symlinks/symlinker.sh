@@ -11,8 +11,8 @@ fail() {
     exit "${2:-1}"
 }
 
-readonly DEFAULT_SUFFIX='-json.log'
-readonly DEFAULT_SRC_DIR='/var/lib/docker/containers'
+declare -r DEFAULT_SUFFIX='-json.log'
+declare -r DEFAULT_SRC_DIR='/var/lib/docker/containers'
 
 if [[ $# -lt 1 ]]; then
     debug ""
@@ -28,9 +28,9 @@ if [[ $# -lt 1 ]]; then
     exit 0
 fi
 
-readonly DST_DIR="${1}"
-readonly SUFFIX="${2:-"${DEFAULT_SUFFIX}"}"
-readonly SRC_DIR="${3:-"${DEFAULT_SRC_DIR}"}"
+declare -r DST_DIR="${1}"
+declare -r SUFFIX="${2:-"${DEFAULT_SUFFIX}"}"
+declare -r SRC_DIR="${3:-"${DEFAULT_SRC_DIR}"}"
 
 if [ ! -r "${SRC_DIR}" ]; then
   fail "ERROR: User do not have read access to ${SRC_DIR}"
