@@ -18,6 +18,33 @@ if [[ "${#}" -lt 2 ]]; then
     exit
 fi
 
+stderr() {
+    echo "${@}" 1>&2
+}
+
+fail() {
+    stderr "${1}"
+    stderr ""
+    stderr "Exiting …"
+    exit "${2:-1}"
+}
+
+missing_dependencies=false
+declare -r dependencies=(
+    logger
+    nmcli
+    notify-send
+    rsync
+)
+for dep in "${dependencies[@]}"; do
+  if ! command -v "${dep}" &> /dev/null; then
+    stderr "❌ ERROR: Missing dependency ${dep}"
+    missing_dependencies=true
+  fi
+done
+if ${missing_dependencies}; then
+  fail 'Please install the missing dependencies!'
+fi
 if [[ "${VERBOSE:-0}" == 2 ]]; then
   set -x
 fi
@@ -76,7 +103,7 @@ declare -r RSYNC_CMD
 ##############################     functions     ##############################{{{
 
 # print to both stdout and log
-logprint () {
+logprint() {
     if [[ -n ${VERBOSE+x} ]]; then
         echo "${LOG_PREFIX} ${1}"
     fi
@@ -87,8 +114,8 @@ logprint () {
 }
 
 # print to both stderr and log
-logprint_err () {
-    echo "${LOG_PREFIX} ${1}" 1>&2
+logprint_err() {
+    stderr "${LOG_PREFIX} ${1}"
     logger -p syslog.err "${LOG_PREFIX} ${1}"
     if (command -v notify-send &> /dev/null); then
         notify-send --urgency=critical "${LOG_PREFIX} ${1}\n\nPlease check journalctl for more info."
@@ -157,4 +184,3 @@ else
     exit 1
 fi
 #}}}
-
