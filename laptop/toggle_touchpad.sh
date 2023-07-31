@@ -2,17 +2,6 @@
 
 set -euo pipefail
 
-stderr() {
-    echo "${@}" 1>&2
-}
-
-fail() {
-    stderr "${1}"
-    stderr ""
-    stderr "Exiting …"
-    exit "${2:-1}"
-}
-
 missing_dependencies=false
 readonly dependencies=(
   xinput
@@ -36,4 +25,4 @@ if [ "${ENABLED}" = "1" ]; then
     xinput --disable "${ID}"
 else
     xinput --enable "${ID}"
-fi;
+fi

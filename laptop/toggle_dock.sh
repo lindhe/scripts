@@ -1,16 +1,19 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-RES=''
-SCRIPTS_LOCATION="${HOME}/git/lindhe/scripts"
+set -euo pipefail
 
-if "${SCRIPTS_LOCATION}"/dock/check_for_dock.sh; then
-    "${SCRIPTS_LOCATION}"/dock/monman.py -a ${IAMAT:+~/.config/monitors/${IAMAT}.json} \
-        && RES='Docking successful!' || RES='Docking failed!';
+LOG_LINE=''
+declare -r SCRIPTS_LOCATION="${HOME}/git/lindhe/scripts"
+
+if "${SCRIPTS_LOCATION}"/laptop/check_for_dock.sh; then
+    "${SCRIPTS_LOCATION}"/laptop/monman.py -a ${IAMAT:+~/.config/monitors/${IAMAT}.json} \
+        && LOG_LINE='Docking successful!' || LOG_LINE='Docking failed!';
 else
     "${SCRIPTS_LOCATION}"/dock/monman.py -d \
-        && RES='Undocking sucessful!' || RES='Undocking failed!';
+        && LOG_LINE='Undocking sucessful!' || LOG_LINE='Undocking failed!';
 fi
 
-logger "${RES}";
+logger "${LOG_LINE}";
 
+# Run .xprofile to set Keyboard etc.
 ~/.xprofile
