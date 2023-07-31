@@ -3,6 +3,20 @@
 
 set -euo pipefail
 
+missing_dependencies=false
+readonly dependencies=(
+  nextcloud.export
+)
+for dep in "${dependencies[@]}"; do
+  if ! command -v "${dep}" &> /dev/null; then
+    stderr "❌ ERROR: Missing dependency ${dep}"
+    missing_dependencies=true
+  fi
+done
+if ${missing_dependencies}; then
+  fail 'Please install the missing dependencies!'
+fi
+
 if [[ -z ${VERBOSE+x} ]]; then
     VERBOSE=0
 fi
