@@ -1,8 +1,38 @@
-#!/bin/bash
-ID=$(xinput --list --id-only 'SynPS/2 Synaptics TouchPad')
-ENABLED=$(xinput --list-props "${ID}" | grep 'Device Enabled' | awk '{print substr($0,length,1)}')
+#!/usr/bin/env bash
 
-if [ "$ENABLED" = "1" ]; then
+set -euo pipefail
+
+stderr() {
+    echo "${@}" 1>&2
+}
+
+fail() {
+    stderr "${1}"
+    stderr ""
+    stderr "Exiting …"
+    exit "${2:-1}"
+}
+
+missing_dependencies=false
+readonly dependencies=(
+  xinput
+)
+for dep in "${dependencies[@]}"; do
+  if ! command -v "${dep}" &> /dev/null; then
+    stderr "❌ ERROR: Missing dependency ${dep}"
+    missing_dependencies=true
+  fi
+done
+if ${missing_dependencies}; then
+  fail 'Please install the missing dependencies!'
+fi
+
+ID=$(xinput --list --id-only 'SynPS/2 Synaptics TouchPad')
+declare -r ID
+ENABLED=$(xinput --list-props "${ID}" | grep 'Device Enabled' | awk '{print substr($0,length,1)}')
+declare -r ENABLED
+
+if [ "${ENABLED}" = "1" ]; then
     xinput --disable "${ID}"
 else
     xinput --enable "${ID}"
