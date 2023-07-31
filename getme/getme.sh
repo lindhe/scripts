@@ -14,6 +14,22 @@ fail() {
     exit "${2:-1}"
 }
 
+missing_dependencies=false
+readonly dependencies=(
+  curl
+  jq
+  wget
+)
+for dep in "${dependencies[@]}"; do
+  if ! command -v "${dep}" &> /dev/null; then
+    stderr "❌ ERROR: Missing dependency ${dep}"
+    missing_dependencies=true
+  fi
+done
+
+if ${missing_dependencies}; then
+  fail 'Please install the missing dependencies!'
+fi
 if [[ -n ${VERBOSE+x} ]]; then
     stderr "GetMe"
     stderr "  … some programs!"
