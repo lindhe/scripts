@@ -2,20 +2,20 @@
 
 set -euo pipefail
 
-debug() {
+stderr() {
     echo "${@}" 1>&2
 }
 
 fail() {
-    debug "${1}"
+    stderr "${1}"
     exit "${2:-1}"
 }
 
 if [[ $# -lt 2 ]]; then
-    debug ""
-    debug "USAGE:"
-    debug "    $(basename "${0}") SSID PASSWORD [file.png]"
-    debug ""
+    stderr ""
+    stderr "USAGE:"
+    stderr "    $(basename "${0}") SSID PASSWORD [file.png]"
+    stderr ""
     exit 0
 fi
 
