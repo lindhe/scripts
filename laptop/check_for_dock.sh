@@ -1,6 +1,4 @@
 #!/bin/bash
-#
-# Returns True if docked
 
 # If the dock ethernet interface is available, we are probably docked.
 ip link show eth0 2> /dev/null > /dev/null;

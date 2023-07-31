@@ -13,6 +13,4 @@ fi
 
 logger "${RES}";
 
-# Resource .xprofile
 ~/.xprofile
-
