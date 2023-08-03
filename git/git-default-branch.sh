@@ -47,7 +47,7 @@ if git symbolic-ref -q refs/remotes/origin/HEAD > /dev/null; then
   exit 0
 else
   for branch in "${common_default_branches[@]}"; do
-    if git branch -l "${branch}"; then
+    if [[ -n "$(git branch -l "${branch}")" ]]; then
       echo "${branch}"
       exit 0
     fi
