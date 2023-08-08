@@ -35,14 +35,19 @@ if ${missing_dependencies}; then
   fail 'Please install the missing dependencies!'
 fi
 
+docked=false
+
 # If the dock ethernet interface is available, we are probably docked.
-ip link show eth0 2>&1 /dev/null
-declare -r eth_if="${?}"
+if ip link show eth0 &> /dev/null; then
+  docked=true
+fi
 
 # If a monitor is connected to DP-1-1 (or variants), we are probably docked.
-monitors=$(xrandr --query | grep -E 'DP-?[1-2]-[1-2] connected')
+if xrandr --query | grep -q -E 'DP-?[1-2]-[1-2] connected'; then
+  docked=true
+fi
 
-if [[ "${eth_if}" == "0" ]] || [[ -n "${monitors}" ]]; then
+if [[ "${docked}" == "true" ]]; then
   echo "Connected to dock"
   true
 else
