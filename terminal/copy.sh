@@ -28,7 +28,9 @@ else
   declare -r IS_WSL=false
 fi
 
-if [[ "${IS_WSL}" == "false" ]]; then
+if [[ "${IS_WSL}" == "true" ]]; then
+  declare -r CLIPBOARD_CMD='/mnt/c/Windows/System32/clip.exe'
+else
   missing_dependencies=false
   declare -r dependencies=(
     xclip
@@ -42,10 +44,7 @@ if [[ "${IS_WSL}" == "false" ]]; then
   if ${missing_dependencies}; then
     fail 'Please install the missing dependencies!'
   fi
+  declare -r CLIPBOARD_CMD='xclip -selection clipboard'
 fi
 
-if [[ "${IS_WSL}" == "true" ]]; then
-  /mnt/c/Windows/System32/clip.exe < "${1}"
-else
-  xclip -selection clipboard < "${1}"
-fi
+${CLIPBOARD_CMD} < "${1}"
