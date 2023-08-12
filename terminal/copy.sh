@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copy the contents of a file to the clipboard.
+# Copy stdin or file contents into the clipboard.
 
 set -euo pipefail
 
@@ -13,14 +13,6 @@ fail() {
     stderr "Exiting …"
     exit "${2:-1}"
 }
-
-if [[ $# -ne 1 ]]; then
-    stderr ""
-    stderr "USAGE:"
-    stderr "    ${0} <file>"
-    stderr ""
-    exit 0
-fi
 
 if [[ "$(uname -r)" =~ .*microsoft.* ]]; then
   declare -r IS_WSL=true
@@ -47,4 +39,9 @@ else
   declare -r CLIPBOARD_CMD='xclip -selection clipboard'
 fi
 
-${CLIPBOARD_CMD} < "${1}"
+if [[ $# -eq 0 ]]; then
+  # no args => stdin
+  ${CLIPBOARD_CMD}
+else
+  ${CLIPBOARD_CMD} < "${1}"
+fi
