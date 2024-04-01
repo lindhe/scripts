@@ -45,10 +45,10 @@ fi
 if [[ "${IAMAT}" == '"home"' ]]; then
     mosquitto_pub \
         -h "${BROKER_HOSTNAME}" -p "${BROKER_PORT}" \
-        -t '/laptops/blaptop/battery/percentage' \
+        -t "/laptops/$(hostname)/battery/percentage" \
         -m "$(cat /sys/class/power_supply/BAT0/capacity)"
     mosquitto_pub \
         -h "${BROKER_HOSTNAME}" -p "${BROKER_PORT}" \
-        -t '/laptops/blaptop/battery/power/state' \
+        -t "/laptops/$(hostname)/battery/power/state" \
         -m "$(cat /sys/class/power_supply/AC/online)"
 fi
