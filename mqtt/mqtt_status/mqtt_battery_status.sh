@@ -11,6 +11,17 @@ fail() {
     exit "${2:-1}"
 }
 
+if [[ $# -lt 1 ]]; then
+    stderr ""
+    stderr "USAGE:"
+    stderr "    ${0} mqtt.example.com 1883"
+    stderr ""
+    exit 0
+fi
+
+BROKER_HOSTNAME="${1}"
+BROKER_PORT="${2:-1883}"
+
 missing_dependencies=false
 readonly dependencies=(
   dig
@@ -33,10 +44,11 @@ fi
 
 if [[ "${IAMAT}" == '"home"' ]]; then
     mosquitto_pub \
+        -h "${BROKER_HOSTNAME}" -p "${BROKER_PORT}" \
         -t '/laptops/blaptop/battery/percentage' \
         -m "$(cat /sys/class/power_supply/BAT0/capacity)"
     mosquitto_pub \
+        -h "${BROKER_HOSTNAME}" -p "${BROKER_PORT}" \
         -t '/laptops/blaptop/battery/power/state' \
         -m "$(cat /sys/class/power_supply/AC/online)"
 fi
-
