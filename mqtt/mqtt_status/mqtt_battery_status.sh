@@ -13,6 +13,7 @@ fail() {
 
 missing_dependencies=false
 readonly dependencies=(
+  dig
   mosquitto_pub
 )
 for dep in "${dependencies[@]}"; do
@@ -25,7 +26,12 @@ if ${missing_dependencies}; then
   fail 'Please install the missing dependencies!'
 fi
 
-if [[ "${IAMAT}" == "home" ]]; then
+if [[ -z ${IAMAT+x} ]]; then
+  # Catch unset IAMAT
+  IAMAT="$(dig +short iamat.lindhe.io TXT)"
+fi
+
+if [[ "${IAMAT}" == '"home"' ]]; then
     mosquitto_pub \
         -t '/laptops/blaptop/battery/percentage' \
         -m "$(cat /sys/class/power_supply/BAT0/capacity)"
