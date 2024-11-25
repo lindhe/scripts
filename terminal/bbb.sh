@@ -34,4 +34,10 @@ else
   INPUT="${*}"
 fi
 
+# Add missing padding.
+# This is commonly reqired when grabbing b64 strings from a JWT.
+while [[ $(( ${#INPUT} % 4 )) -ne 0 ]]; do
+  INPUT+='='
+done
+
 echo -n "${INPUT}" | base64 -d ; echo
