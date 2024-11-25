@@ -28,8 +28,7 @@ if ${missing_dependencies}; then
   fail 'Please install the missing dependencies!'
 fi
 
-if [[ $# -eq 0 ]]; then
-  # no args => stdin
+if [[ -p /dev/stdin ]]; then
   base64 -d ; echo
 else
   echo -n "${*}" | base64 -d ; echo
