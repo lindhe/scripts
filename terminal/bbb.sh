@@ -29,7 +29,9 @@ if ${missing_dependencies}; then
 fi
 
 if [[ -p /dev/stdin ]]; then
-  base64 -d ; echo
+  INPUT="$(cat -)"
 else
-  echo -n "${*}" | base64 -d ; echo
+  INPUT="${*}"
 fi
+
+echo -n "${INPUT}" | base64 -d ; echo
