@@ -28,16 +28,18 @@ if ${missing_dependencies}; then
   fail 'Please install the missing dependencies!'
 fi
 
+declare -a INPUT
 if [[ -p /dev/stdin ]]; then
-  INPUT="$(cat -)"
+  readarray -t INPUT
 else
-  INPUT="${*}"
+  INPUT=("${@}")
 fi
+declare -r INPUT
 
-# Add missing padding.
-# This is commonly reqired when grabbing b64 strings from a JWT.
-while [[ $(( ${#INPUT} % 4 )) -ne 0 ]]; do
-  INPUT+='='
+for line in "${INPUT[@]//\"}"; do # Trim "
+  while [[ $(( ${#line} % 4 )) -ne 0 ]]; do
+    line+='=' # Add missing padding
+  done
+  base64 -d <<< "${line}"
+  printf '\n'
 done
-
-echo -n "${INPUT}" | base64 -d ; echo
