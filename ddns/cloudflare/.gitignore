@@ -1,7 +1,0 @@
-.mypy_cache/
-
-# pyinstaller
-dist/
-build/
-*.spec
-update_dns_record
