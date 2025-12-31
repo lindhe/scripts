@@ -5,7 +5,7 @@
 # backup.
 
 ###############################     preamble     ###############################{{{
-set -euo pipefail
+set -uo pipefail
 
 if [[ "${#}" -lt 2 ]]; then
     echo "USAGE:"

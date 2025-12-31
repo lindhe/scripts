@@ -3,7 +3,7 @@
 # License: MIT
 # Author: Andreas Lindhé
 
-set -euo pipefail
+set -uo pipefail
 
 stderr() {
     echo "${@}" 1>&2

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Copy stdin or file contents into the clipboard.
 
-set -euo pipefail
+set -uo pipefail
 
 stderr() {
     echo "${@}" 1>&2

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -uo pipefail
 
 LOG_LINE=''
 declare -r SCRIPTS_LOCATION="${HOME}/git/lindhe/scripts"

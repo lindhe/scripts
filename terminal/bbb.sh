@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # A smart wrapper for base64 decoding.
 
-set -euo pipefail
+set -uo pipefail
 
 stderr() {
     echo "${@}" 1>&2

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck disable=2181
 
-set -euo pipefail
+set -uo pipefail
 
 missing_dependencies=false
 readonly dependencies=(
