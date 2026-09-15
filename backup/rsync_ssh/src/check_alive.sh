@@ -2,7 +2,7 @@
 
 # Checks the age of a timestamp on file
 
-set -uo pipefail
+set -euo pipefail
 
 if [[ "${VERBOSE:-0}" == 2 ]]; then
   set -x

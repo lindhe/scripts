@@ -2,7 +2,7 @@
 
 # {{{
 
-set -uo pipefail
+set -euo pipefail
 
 stderr() {
     echo "${@}" 1>&2

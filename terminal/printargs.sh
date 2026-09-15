@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # A script to print the given arguments, to help me debug things.
 
-set -uo pipefail
+set -euo pipefail
 
 echo -e "${0} was called with the following arguments:\n"
 
